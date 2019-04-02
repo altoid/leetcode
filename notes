@@ -35,7 +35,7 @@ a =    [14 18 18 23 | 27 27 34 38 39 40]
 b = [14 17 19 20 22 | 28 28 31]
 
 since the max among the left elements (23) is <= min among the right elements (27),
-the of the two arrays is 25.
+the median of the two arrays is 25.
 
 ============================================================= even/odd
 [11 13 14 19 26 27 27 29 30 34] 10
@@ -60,10 +60,19 @@ on the left and 9 on the right.
 a = [14 18 18 21 22 24 38 39 39] 9
 b = [11 15 16 25 25] 5
 
+ma = 22
+mb = 16
+
 a = [14 18 18 21 22 | 24 38 39 39]
 b =       [11 15 16 | 25 25]
 
-median is 22
+should we put the partition one to the left in the array with the bigger median?
+
+a =    [14 18 18 21 | 22 24 38 39 39]
+b =       [11 15 16 | 25 25]
+
+if we do this then we still maintain the condition that max(left) <= min(right)
+giving us a median of 21.5 which is the right answer.
 
 ============================
 [10 12 14 14 20 25 30 33] 8
