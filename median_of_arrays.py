@@ -99,3 +99,11 @@ class TestMedian(unittest.TestCase):
         arr = [1, 2, 2, 2, 2, 3, 4, 5, 5, 6, 7, 8]
         result = binary_search(self.basic_arr, 2)
         self.assertEqual(1, result)
+
+    def test_bsearch_5(self):
+        arr = [1, 2, 2, 2, 2, 3, 4, 5, 5, 6, 7, 8]
+        result = binary_search(self.basic_arr, 3)
+        self.assertEqual(5, result)
+
+        result = binary_search(self.basic_arr, 5)
+        self.assertEqual(7, result)
