@@ -26,7 +26,7 @@ object NextPermutation_31 {
         case None => a.sorted
         case Some(x) => {
           // find index of smallest successor of a(x) to the right of x
-          val rest = a.takeRight(a.length - x - 1)
+          val rest = a.takeRight(a.length - x - 1).filter(y => y > a(x))
           val idx = a.indexWhere(x => x == rest.min)
 
           val t = a(idx)
@@ -67,7 +67,19 @@ object NextPermutation_31 {
 
     arr = nextPermutation(arr)
     println(arr.mkString(" "))
+//
+//    println(nextPermutation(Array(4,3,2,1)).mkString(" "))
 
-    println(nextPermutation(Array(4,3,2,1)).mkString(" "))
+    arr = Array(1,1,5)
+    println(arr.mkString(" "))
+
+    arr = nextPermutation(arr)
+    println(arr.mkString(" "))
+
+    arr = nextPermutation(arr)
+    println(arr.mkString(" "))
+
+    arr = nextPermutation(arr)
+    println(arr.mkString(" "))
   }
 }
