@@ -7,12 +7,63 @@
 # Find the median of the two sorted arrays. The overall run time
 # complexity should be O(log (m+n)).
 
+from __future__ import division
+
 import unittest
 import random
 
 
 def find_median(arr1, arr2):
-    pass
+    # take a to be the longer one
+    a = arr1
+    b = arr2
+    if len(arr2) > len(arr1):
+        a, b = b, a
+
+    paritya = len(a) % 2
+    parityb = len(b) % 2
+    if paritya != 0 or parityb != 0:
+        raise Exception("fuck you")
+
+    partitiona = len(a) // 2
+    partitionb = len(b) // 2
+
+    print
+    print a
+    print b
+    print a[0 : partitiona], a[partitiona:]
+    print b[0 : partitionb], b[partitionb:]
+
+    aleft = a[partitiona - 1]
+    bleft = b[partitionb - 1]
+    aright = a[partitiona]
+    bright = b[partitiona]
+
+    leftmax = max(aleft, bleft)
+    rightmin = min(aright, bright)
+    print aleft, bleft
+    print aright, bright
+    print leftmax, rightmin
+    amedian = test_median(a)
+    bmedian = test_median(b)
+
+    print amedian, bmedian
+
+    # focus on b because it's shorter.  if bright <= aright, look in the right part of b
+    # for the smallest value bigger than the smallest median.
+    # if bright > aright, look in the left part of be for the smallest value bigger than the smallest median.
+
+
+
+def test_median(arr):
+    # arr does not have to be sorted
+    sorted_arr = sorted(arr)
+    m = len(sorted_arr) // 2
+
+    if len(sorted_arr) % 2 == 1:
+        return sorted_arr[m]
+
+    return (sorted_arr[m] + sorted_arr[m - 1]) / 2
 
 
 def binary_search_helper(arr, target, left, right):
@@ -113,7 +164,7 @@ def squishy_binary_search(arr, target):
 
 
 def generate_array():
-    length = random.randint(5, 11)
+    length = random.randint(3, 7) * 2
     return sorted([random.randint(10, 40) for i in xrange(length)])
 
 
@@ -126,13 +177,13 @@ class TestMedian(unittest.TestCase):
         a = generate_array()
         b = generate_array()
 
-        if len(a) < len(b):
-            a, b = b, a
+        find_median(a, b)
 
-        print a, len(a)
-        print b, len(b)
+    def test2(selfs):
+        a = [14, 18, 18, 23, 27, 27, 34, 38, 39, 40]
+        b = [14, 17, 19, 20, 22, 28, 28, 31]
 
-        print sorted(a + b)
+        find_median(a, b)
 
     def test_bsearch_1(self):
         # find something.
