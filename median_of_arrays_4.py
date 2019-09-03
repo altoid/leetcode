@@ -11,6 +11,53 @@ from __future__ import division
 
 import unittest
 import random
+from binary_search import binary_search
+
+
+def simple_median(a):
+    len_a = len(a)
+    m = len_a // 2
+    if len_a % 2 == 1:
+        return a[m]
+    return (a[m - 1] + a[m]) / 2.0
+
+
+def true_median(a, b):
+    return simple_median(sorted(a + b))
+
+
+def array_as_str(a, **kwargs):
+    p = kwargs.get('partition')
+    if p is not None:
+        p += 1
+        return "%s | %s [%s]" % (' '.join(map(str, a[:p])), ' '.join(map(str, a[p:])), simple_median(a))
+
+    return '%s [%s]' % (' '.join(map(str, a)), simple_median(a))
+
+
+def partition(a):
+    p = len(a) // 2
+    if len(a) % 2 == 0:
+        p -= 1
+    return p
+
+
+def adjust(a, partition_a, median_a, b, partition_b, median_b):
+    # b is the shorter array
+    if median_b > median_a:
+        # binary search in the left part of b for the leftmost occurrence of the largest value
+        # that is <= the median
+        new_part_b = binary_search.search_largest_less_than(b[:(partition_b + 1)], median_b)
+        new_part_b -= 1  # since the search gave us the left endpoint of the right part
+    else:
+        # binary search in the right part of b for the rightmost occurrence of the smallest value that is >= the median
+        new_part_b = binary_search.search_smallest_greater_than(b[(partition_b + 1):], median_b)
+        new_part_b += (partition_b + 1)  # add back the true index of the median
+
+    delta = new_part_b - partition_b
+
+    new_part_a = partition_a - delta
+    return new_part_a, new_part_b
 
 
 def find_median(arr1, arr2):
@@ -20,261 +67,159 @@ def find_median(arr1, arr2):
     if len(arr2) > len(arr1):
         a, b = b, a
 
-    paritya = len(a) % 2
-    parityb = len(b) % 2
-    if paritya != 0 or parityb != 0:
-        raise Exception("fuck you")
+    median_a = simple_median(a)
+    median_b = simple_median(b)
 
-    partitiona = len(a) // 2
-    partitionb = len(b) // 2
+    parity_len_a = len(a) % 2
+    parity_len_b = len(b) % 2
 
-    print
-    print a
-    print b
-    print a[0 : partitiona], a[partitiona:]
-    print b[0 : partitionb], b[partitionb:]
+    # partition_x is the rightmost index of the left partition
+    partition_a = partition(a)
+    partition_b = partition(b)
 
-    aleft = a[partitiona - 1]
-    bleft = b[partitionb - 1]
-    aright = a[partitiona]
-    bright = b[partitiona]
+    # if the array with the larger median is odd length, subtract 1 from the partition
+    # if median_b > median_a:
+    #     if parity_len_b == 1:
+    #         partition_b -= 1
+    # if median_a > median_b:
+    #     if parity_len_a == 1:
+    #         partition_a -= 1
 
-    leftmax = max(aleft, bleft)
-    rightmin = min(aright, bright)
-    print aleft, bleft
-    print aright, bright
-    print leftmax, rightmin
-    amedian = test_median(a)
-    bmedian = test_median(b)
+    print array_as_str(sorted(a + b))
 
-    print amedian, bmedian
+    print array_as_str(a, partition=partition_a)
+    print array_as_str(b, partition=partition_b)
 
-    # focus on b because it's shorter.  if bright <= aright, look in the right part of b
-    # for the smallest value bigger than the smallest median.
-    # if bright > aright, look in the left part of be for the smallest value bigger than the smallest median.
+    left_max = max(a[partition_a], b[partition_b])
+    right_min = min(a[partition_a + 1], b[partition_b + 1])
 
+    while left_max > right_min:
+        partition_a, partition_b = adjust(a, partition_a, median_a, b, partition_b, median_b)
 
+        print array_as_str(a, partition=partition_a)
+        print array_as_str(b, partition=partition_b)
 
-def test_median(arr):
-    # arr does not have to be sorted
-    sorted_arr = sorted(arr)
-    m = len(sorted_arr) // 2
+        left_max = max(a[partition_a], b[partition_b])
+        right_min = min(a[partition_a + 1], b[partition_b + 1])
 
-    if len(sorted_arr) % 2 == 1:
-        return sorted_arr[m]
+    if parity_len_a != parity_len_b:
+        result = left_max
+    else:
+        result = (left_max + right_min) / 2.0
 
-    return (sorted_arr[m] + sorted_arr[m - 1]) / 2
-
-
-def binary_search_helper(arr, target, left, right):
-    """
-    return the index of the leftmost occurrence of target.  return None if target not present.
-
-    :param arr: sorted array of ints
-    :param target: what we are looking for in arr
-    :param left:
-    :param right:
-    :return:
-    """
-
-    if right < left:
-        raise Exception("NFC 0:  %s, %s, (%s, %s)" % (target, arr, left, right))
-
-    if left == right:
-        if arr[left] == target:
-            return left
-        return None
-
-    m = (left + right) // 2
-
-    if arr[m] == target:
-        # wind to the left until we find the leftmost occurrence of target
-        if m == 0:
-            return m
-
-        while arr[m - 1] == target:
-            m = m - 1
-
-        return m
-
-    if target < arr[m]:
-        return binary_search_helper(arr, target, left, m - 1)
-
-    return binary_search_helper(arr, target, m + 1, right)
-
-
-def binary_search(arr, target):
-    return binary_search_helper(arr, target, 0, len(arr) - 1)
-
-
-def squishy_binary_search_helper(arr, target, left, right):
-    # precondition:  target is <= the largest element in the array.
-    # i.e. something in the array is >= target.
-
-    if right < left:
-        # if we are here, then the target is not present in the array.
-        raise Exception("NFC 1:  %s, %s, (%s, %s)" % (target, arr, left, right))
-
-    if left == right:
-        if arr[left] == target:
-            return left
-
-        for l in xrange(left, len(arr)):
-            if arr[l] >= target:
-                return l
-        raise Exception("NFC 2:  %s, %s, (%s, %s)" % (target, arr, left, right))
-
-    m = (left + right) // 2
-
-    if arr[m] == target:
-        # wind to the left until we find the leftmost occurrence of target
-        if m == 0:
-            return m
-
-        while arr[m - 1] == target:
-            m = m - 1
-
-        return m
-
-    if target < arr[m]:
-        return squishy_binary_search_helper(arr, target, left, m - 1)
-
-    return squishy_binary_search_helper(arr, target, m + 1, right)
-
-
-def squishy_binary_search(arr, target):
-    """
-    return the index of the smallest array element >= target.
-
-    returns None if the array is empty
-    or if the target is bigger than anything in the array.
-
-    :param arr:
-    :param target:
-    :return:
-    """
-
-    if not arr:
-        return None
-
-    if target > arr[-1]:
-        return None
-
-    return squishy_binary_search_helper(arr, target, 0, len(arr) - 1)
+    return result
 
 
 def generate_array():
-    length = random.randint(3, 7) * 2
+    length = random.randint(2, 15)
     return sorted([random.randint(10, 40) for i in xrange(length)])
+
+
+def print_test_case():
+    a = map(str, generate_array())
+    b = map(str, generate_array())
+    print ' '.join(a)
+    print ' '.join(b)
+    print ' '.join(sorted(a + b))
+
+
+if __name__ == '__main__':
+    a = generate_array()
+    b = generate_array()
+    result = find_median(a, b)
+    compare = true_median(a, b)
+    print "a = %s" % array_as_str(a)
+    print "b = %s" % array_as_str(b)
+    print "combo = %s" % array_as_str(sorted(a + b))
+    print "found median = %s" % result
+    print "true median = %s" % compare
 
 
 class TestMedian(unittest.TestCase):
 
-    def setUp(self):
-        self.basic_arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    def test_partition(self):
+        a = [1, 2, 3, 4, 5]
+        p = partition(a)
+        self.assertEqual(p, 2)
 
-    def test1(self):
-        a = generate_array()
-        b = generate_array()
+        a = [1, 2, 3, 4, 5, 6]
+        p = partition(a)
+        self.assertEqual(p, 2)
 
-        find_median(a, b)
+    def test_adjust_1(self):
+        a = [12, 14, 22, 23, 27, 31]
+        b = [11, 11, 26, 32, 38, 40]
 
-    def test2(selfs):
-        a = [14, 18, 18, 23, 27, 27, 34, 38, 39, 40]
-        b = [14, 17, 19, 20, 22, 28, 28, 31]
+        # 12 14 22 | 23 27 31      22.5
+        # 11 11 26 | 32 38 40      29
+        #
+        # 12 14 22 23 | 27 31
+        #       11 11 | 26 32 38 40
 
-        find_median(a, b)
+        median_a = simple_median(a)
+        median_b = simple_median(b)
 
-    def test_bsearch_1(self):
-        # find something.
+        parity_len_a = len(a) % 2
+        parity_len_b = len(b) % 2
 
-        result = binary_search(self.basic_arr, 2)
-        self.assertEqual(1, result)
+        # partition_x is the rightmost index of the left partition
+        partition_a = partition(a)
+        partition_b = partition(b)
 
-    def test_bsearch_2(self):
-        # look for something bigger than anything in the array
-        result = binary_search(self.basic_arr, 22)
-        self.assertIsNone(result)
+        # if the array with the larger median is odd length, subtract 1 from the partition
+        if median_b > median_a:
+            if parity_len_b == 1:
+                partition_b -= 1
+        if median_a > median_b:
+            if parity_len_a == 1:
+                partition_a -= 1
 
-    def test_bsearch_3(self):
-        # look for something smaller than anything in the array
-        result = binary_search(self.basic_arr, 0)
-        self.assertIsNone(result)
+        self.assertEqual(2, partition_a)
+        self.assertEqual(2, partition_b)
+        new_a, new_b = adjust(a, partition_a, median_a, b, partition_b, median_b)
 
-    def test_bsearch_4(self):
-        # look for something that appears a bunch of times
-        arr = [1, 2, 2, 2, 2, 3, 4, 5, 5, 6, 7, 8]
-        result = binary_search(arr, 2)
-        self.assertEqual(1, result)
+        self.assertEqual(3, new_a)
+        self.assertEqual(1, new_b)
 
-    def test_bsearch_5(self):
-        arr = [1, 2, 2, 2, 2, 3, 4, 5, 5, 6, 7, 8]
-        result = binary_search(arr, 3)
-        self.assertEqual(5, result)
+    def test_adjust_1a(self):
+        # like test_adjust_1 but with a and b flipped
+        b = [12, 14, 22, 23, 27, 31]
+        a = [11, 11, 26, 32, 38, 40]
 
-    def test_bsearch_6(self):
-        arr = [1, 2, 2, 2, 2, 3, 4, 5, 5, 6, 7, 8]
+        # 12 14 22 | 23 27 31      22.5
+        # 11 11 26 | 32 38 40      29
+        #
+        # 12 14 22 23 | 27 31
+        #       11 11 | 26 32 38 40
 
-        result = binary_search(arr, 5)
-        self.assertEqual(7, result)
+        median_a = simple_median(a)
+        median_b = simple_median(b)
 
-    def test_squishy_search_01(self):
-        arr = []
-        result = squishy_binary_search(arr, 5)
-        self.assertIsNone(result)
+        parity_len_a = len(a) % 2
+        parity_len_b = len(b) % 2
 
-    def test_squishy_search_02(self):
-        arr = [1, 2, 3, 4, 5]
-        result = squishy_binary_search(arr, 6)
-        self.assertIsNone(result)
+        # partition_x is the rightmost index of the left partition
+        partition_a = partition(a)
+        partition_b = partition(b)
 
-    def test_squishy_search_03(self):
-        arr = [5, 6, 7, 8, 9]
-        result = squishy_binary_search(arr, 7)
-        self.assertEqual(2, result)
+        # if the array with the larger median is odd length, subtract 1 from the partition
+        if median_b > median_a:
+            if parity_len_b == 1:
+                partition_b -= 1
+        if median_a > median_b:
+            if parity_len_a == 1:
+                partition_a -= 1
 
-    def test_squishy_search_04(self):
-        arr = [5, 6, 7, 7, 7, 7, 8, 9]
-        result = squishy_binary_search(arr, 7)
-        self.assertEqual(2, result)
+        self.assertEqual(2, partition_a)
+        self.assertEqual(2, partition_b)
+        new_a, new_b = adjust(a, partition_a, median_a, b, partition_b, median_b)
 
-    def test_squishy_search_05(self):
-        arr = [5, 6, 7, 7, 7, 7, 8, 9]
-        result = squishy_binary_search(arr, 8)
-        self.assertEqual(6, result)
+        self.assertEqual(1, new_a)
+        self.assertEqual(3, new_b)
 
-    def test_squishy_search_06(self):
-        arr = [5, 6, 7, 8, 9, 11, 12, 13, 14]
-        result = squishy_binary_search(arr, 10)
-        self.assertEqual(5, result)
+    def test_median(self):
+        a = [14, 16, 20, 21, 27, 29, 37, 38]
+        b = [13, 17, 21, 22, 23, 29, 31, 31, 32, 35, 35]
 
-    def test_squishy_search_07(self):
-        arr = [5, 6, 7, 8, 9, 11, 12, 13, 14]
-        result = squishy_binary_search(arr, 0)
-        self.assertEqual(0, result)
-
-    def test_squishy_search_08(self):
-        arr = [9, 11]
-        result = squishy_binary_search(arr, 10)
-        self.assertEqual(1, result)
-
-    def test_squishy_search_09(self):
-        arr = [5, 9, 9, 9, 9, 9, 12]
-        result = squishy_binary_search(arr, 10)
-        self.assertEqual(6, result)
-
-    def test_squishy_search_10(self):
-        arr = [5, 9, 9, 9, 9, 9, 9, 12]
-        result = squishy_binary_search(arr, 10)
-        self.assertEqual(7, result)
-
-    def test_squishy_search_11(self):
-        arr = [5, 9, 9, 9, 9, 9, 12]
-        result = squishy_binary_search(arr, 6)
-        self.assertEqual(1, result)
-
-    def test_squishy_search_12(self):
-        arr = [5, 6, 7, 8, 9, 11, 12, 13, 14]
-        result = squishy_binary_search(arr, 14)
-        self.assertEqual(8, result)
-
+        result = find_median(a, b)
+        self.assertEqual(27, result)
