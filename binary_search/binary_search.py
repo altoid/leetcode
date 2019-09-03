@@ -120,8 +120,8 @@ def search_loc(arr, target):
 
 
 def search_largest_less_than(arr, target):
-    # give me the (rightmost) index of the largest value in a that is strictly less than target
-    # need to handle the case where target isn't in the array but something less than target is
+    # give me the (leftmost) index of the largest value in a that is strictly less than target.
+    # need to handle the case where target isn't in the array but something less than target is.
     # binary search into the array for where target would go if we were to insert it.
 
     here = search_loc(arr, target)
@@ -135,7 +135,7 @@ def search_largest_less_than(arr, target):
 
 
 def search_smallest_greater_than(arr, target):
-    # give me the (leftmost) index of the smallest value in a that is strictly greater than target
+    # give me the (rightmost) index of the smallest value in a that is strictly greater than target
     here = search_loc(arr, target)
     righter = search_rightmost(arr, target, here + 1, len(arr) - 1)
     if righter is not None:
