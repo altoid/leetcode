@@ -125,7 +125,12 @@ def search_largest_less_than(arr, target):
     # binary search into the array for where target would go if we were to insert it.
 
     here = search_loc(arr, target)
+    lefter = search_leftmost(arr, target, 0, here - 1)
+    if lefter is not None:
+        here = lefter
+        
     if here > 0:
+        # see if there is an occurrence of target that is to the left of <here>
         return here - 1
 
 
