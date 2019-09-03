@@ -146,7 +146,7 @@ def search_smallest_greater_than(arr, target):
 
     if here < len(arr) - 1:
         return here + 1
-    
+
 
 class BSTest(unittest.TestCase):
 
