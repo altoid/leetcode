@@ -128,7 +128,7 @@ def search_largest_less_than(arr, target):
     lefter = search_leftmost(arr, target, 0, here - 1)
     if lefter is not None:
         here = lefter
-        
+
     if here > 0:
         # see if there is an occurrence of target that is to the left of <here>
         return here - 1
@@ -136,11 +136,17 @@ def search_largest_less_than(arr, target):
 
 def search_smallest_greater_than(arr, target):
     # give me the (leftmost) index of the smallest value in a that is strictly greater than target
-    range = search_range(arr, target)
-    if range is not None:
-        if range[1] < len(arr) - 1:
-            return range[1] + 1
+    here = search_loc(arr, target)
+    righter = search_rightmost(arr, target, here + 1, len(arr) - 1)
+    if righter is not None:
+        here = righter
 
+    if arr[here] != target:
+        return here
+
+    if here < len(arr) - 1:
+        return here + 1
+    
 
 class BSTest(unittest.TestCase):
 
@@ -231,3 +237,11 @@ class BSTest(unittest.TestCase):
         self.assertEqual(6, search_smallest_greater_than(a, 3))
         self.assertEqual(10, search_smallest_greater_than(a, 4))
         self.assertIsNone(search_smallest_greater_than(a, 5))
+
+    def test_smallest_greater_than_no_target(self):
+        a = [1, 3, 5, 7, 9, 11, 13]
+
+        self.assertIsNone(search_smallest_greater_than(a, 13))
+        self.assertEquals(4, search_smallest_greater_than(a, 8))
+        self.assertEquals(0, search_smallest_greater_than(a, 0))
+
