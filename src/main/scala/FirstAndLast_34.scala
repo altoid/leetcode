@@ -11,13 +11,15 @@ object FirstAndLast_34 {
   }
 
   def uniques(a: Array[Int]): Array[Int] = {
-    a match {
-      case Array() => Array[Int]()
-      case Array(x, _*) => {
-        val (_, rest) = a.span(p => p == x)
-        x +: uniques(rest)
-      }
-    }
+//    a match {
+//      case Array() => Array[Int]()
+//      case Array(x, _*) => {
+//        val (_, rest) = a.span(p => p == x)
+//        x +: uniques(rest)
+//      }
+//    }
+    // this is faster
+    a.toSet.toArray
   }
 
   def stupid_searchRange(a: Array[Int], target: Int): Array[Int] = {
@@ -98,7 +100,7 @@ object FirstAndLast_34 {
         val result = findLeftMost_helper(0, idx - 1)
         result match {
           case None => Some(idx)
-          case Some(x) => result
+          case Some(_) => result
         }
       }
     }

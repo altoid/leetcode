@@ -88,7 +88,7 @@ def search_loc_helper(arr, target, left, right):
         return None
 
     m = (left + right) / 2
-    if left == right:
+    if right - left < 2:
         if arr[m] < target:
             return m + 1
 
@@ -245,3 +245,7 @@ class BSTest(unittest.TestCase):
         self.assertEquals(4, search_smallest_greater_than(a, 8))
         self.assertEquals(0, search_smallest_greater_than(a, 0))
 
+    def test_smallest_greater_than_no_target_II(self):
+        a = [19, 34]
+
+        self.assertEquals(0, search_smallest_greater_than(a, 18.5))
