@@ -43,6 +43,9 @@ def dedup(arr):
                     k += 1
                     j += 1
                 array_len = k
+
+                # don't increment i now - the value in that slot has been overwritten.
+                continue
         i += 1
 
     return array_len
@@ -73,7 +76,8 @@ class MyTest(unittest.TestCase):
 
     def test2(self):
         arr = [0, 0, 0, 1, 1, 1, 1, 2, 3, 3]
-        result = 7
-        self.assertEqual(result, dedup(arr))
-        self.assertEqual([0, 0, 1, 1, 2, 3, 3], arr[:result])
+        expected = 7
+        result = dedup(arr)
+        self.assertEqual(expected, result)
+        self.assertEqual([0, 0, 1, 1, 2, 3, 3], arr[:expected])
 
