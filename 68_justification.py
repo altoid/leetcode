@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import unittest
-from pprint import pprint
 
 
 def min_length(words):
@@ -18,7 +17,14 @@ def min_length(words):
     return l
 
 
-def justify_line(line, maxlength):
+def justify_left(line, maxlength):
+    result = ' '.join(line)
+    left_padding = maxlength - len(result)
+    result += ' ' * left_padding
+    return result
+
+
+def justify_full(line, maxlength):
     # if the line just has one word, right-pad and be done with it.
     nchars = sum(map(len, line))
     spaces_needed = maxlength - nchars
@@ -64,7 +70,9 @@ def justify(words, maxlength):
 
     text.append(current_line)
 
-    result = [justify_line(x, maxlength) for x in text]
+    result = [justify_full(x, maxlength) for x in text[:-1]]
+    last_line = justify_left(text[-1], maxlength)
+    result.append(last_line)
     return result
 
 
@@ -75,19 +83,39 @@ class MyTest(unittest.TestCase):
         self.assertEqual(0, min_length([]))
 
     def test_justify_line(self):
-        self.assertEqual("Science  is  what we", justify_line(["Science", "is", "what", "we"], 20))
+        self.assertEqual("Science  is  what we", justify_full(["Science", "is", "what", "we"], 20))
 
     def test_single_word(self):
         words = ['food']
         maxwidth = 11
 
-        text = justify(words, maxwidth)
-        pprint(text)
+        control = [
+            "food       "
+        ]
+        self.assertEqual(control, justify(words, maxwidth))
+
+    def test_example_2(self):
+        words = ["What", "must", "be", "acknowledgment", "shall", "be"]
+        maxwidth = 16
+
+        control = [
+            "What   must   be",
+            "acknowledgment  ",
+            "shall be        "
+        ]
+        self.assertEqual(control, justify(words, maxwidth))
 
     def test_example_3(self):
         words = ["Science", "is", "what", "we", "understand", "well", "enough", "to", "explain",
                  "to", "a", "computer.", "Art", "is", "everything", "else", "we", "do"]
-        maxWidth = 20
+        maxwidth = 20
 
-        text = justify(words, maxWidth)
-        pprint(text)
+        control = [
+            "Science  is  what we",
+            "understand      well",
+            "enough to explain to",
+            "a  computer.  Art is",
+            "everything  else  we",
+            "do                  "
+        ]
+        self.assertEqual(control, justify(words, maxwidth))
