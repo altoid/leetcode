@@ -3,7 +3,7 @@
 import unittest
 
 
-def dedup(arr):
+def dedup(arr, dup_limit=2):
     """
     Given a sorted array nums, remove the duplicates in-place such
     that duplicates appeared at most twice and return the new length.
@@ -15,7 +15,7 @@ def dedup(arr):
     :return:  length of de-duped array
     """
 
-    if len(arr) < 3:
+    if len(arr) <= dup_limit:
         return len(arr)
 
     current_value = arr[0]
@@ -28,7 +28,7 @@ def dedup(arr):
             cv_count = 1
         else:
             cv_count += 1
-            if cv_count > 2:
+            if cv_count > dup_limit:
                 # find the next value not equal to the one we are pointing at.
                 # from there to the end of the array, slide everything over (if
                 # we can).
@@ -81,3 +81,18 @@ class MyTest(unittest.TestCase):
         self.assertEqual(expected, result)
         self.assertEqual([0, 0, 1, 1, 2, 3, 3], arr[:expected])
 
+    def test3(self):
+        # dup limit is 3
+        arr = [0, 0, 0, 1, 1, 1, 1, 2, 3, 3]
+        expected = 9
+        result = dedup(arr, 3)
+        self.assertEqual(expected, result)
+        self.assertEqual([0, 0, 0, 1, 1, 1, 2, 3, 3], arr[:expected])
+
+    def test4(self):
+        # dup limit is 1
+        arr = [0, 0, 0, 1, 1, 1, 1, 2, 3, 3]
+        expected = 4
+        result = dedup(arr, 1)
+        self.assertEqual(expected, result)
+        self.assertEqual([0, 1, 2, 3], arr[:expected])
