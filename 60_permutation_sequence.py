@@ -33,16 +33,6 @@ class Solution(object):
     def my_factorial(self, n):
         return self.factorials[n]
 
-    def roundup(self, k, n):
-        """
-        round up k to nearest multiple of n
-
-        :param k:
-        :param n:
-        :return:
-        """
-        return ((k + (n - 1)) / n) * n
-
     def howmany(self, k, n):
         """
         how many intervals of size n are covered by k?
@@ -101,17 +91,6 @@ class MyTest(unittest.TestCase):
     def setUp(self):
         self.solution = Solution()
 
-    def test_roundup(self):
-        self.assertEqual(0, self.solution.roundup(0, 5))
-        self.assertEqual(5, self.solution.roundup(1, 5))
-        self.assertEqual(5, self.solution.roundup(2, 5))
-        self.assertEqual(5, self.solution.roundup(3, 5))
-        self.assertEqual(5, self.solution.roundup(4, 5))
-        self.assertEqual(5, self.solution.roundup(5, 5))
-        self.assertEqual(10, self.solution.roundup(6, 5))
-        self.assertEqual(10, self.solution.roundup(7, 5))
-        self.assertEqual(15, self.solution.roundup(11, 5))
-
     def test_howmany(self):
         self.assertEqual(0, self.solution.howmany(0, 5))
         self.assertEqual(1, self.solution.howmany(1, 5))
@@ -166,3 +145,6 @@ class MyTest(unittest.TestCase):
     def test_examples(self):
         self.assertEqual([2, 1, 3], self.solution.getPermutation(3, 3))
         self.assertEqual([2, 3, 1, 4], self.solution.getPermutation(4, 9))
+
+        self.assertEqual([1, 2, 3, 4, 5], self.solution.getPermutation(5, 1))
+        self.assertEqual([5, 4, 3, 2, 1], self.solution.getPermutation(5, 120))
