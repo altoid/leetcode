@@ -84,7 +84,7 @@ class Solution(object):
             prefix.append(e)
             e = self.get_next_element(prefix, k, a)
 
-        return prefix
+        return ''.join(map(str, prefix))
 
 
 class MyTest(unittest.TestCase):
@@ -143,8 +143,8 @@ class MyTest(unittest.TestCase):
         self.assertIsNone(self.solution.get_next_element([1, 2, 3, 4, 5], 57, a))
 
     def test_examples(self):
-        self.assertEqual([2, 1, 3], self.solution.getPermutation(3, 3))
-        self.assertEqual([2, 3, 1, 4], self.solution.getPermutation(4, 9))
+        self.assertEqual('213', self.solution.getPermutation(3, 3))
+        self.assertEqual('2314', self.solution.getPermutation(4, 9))
 
-        self.assertEqual([1, 2, 3, 4, 5], self.solution.getPermutation(5, 1))
-        self.assertEqual([5, 4, 3, 2, 1], self.solution.getPermutation(5, 120))
+        self.assertEqual('12345', self.solution.getPermutation(5, 1))
+        self.assertEqual('54321', self.solution.getPermutation(5, 120))
