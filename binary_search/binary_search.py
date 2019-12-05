@@ -34,6 +34,15 @@ def search(arr, target):
 
 
 def search_leftmost(arr, target, left, right):
+    """
+    return the index of the leftmost occurrence of <target> in <arr>.  returns None if target is not in array.
+
+    :param arr:
+    :param target:
+    :param left:
+    :param right:
+    :return:
+    """
     if right < left:
         return None
 
@@ -49,6 +58,15 @@ def search_leftmost(arr, target, left, right):
 
 
 def search_rightmost(arr, target, left, right):
+    """
+    return the index of the rightmost occurrence of <target> in <arr>.  returns None if target is not in array.
+
+    :param arr:
+    :param target:
+    :param left:
+    :param right:
+    :return:
+    """
     if right < left:
         return None
 
@@ -121,7 +139,7 @@ def search_loc(arr, target):
 
 def search_largest_less_than(arr, target):
     # give me the (leftmost) index of the largest value in a that is strictly less than target.
-    # need to handle the case where target isn't in the array but something less than target is.
+    # TODO: need to handle the case where target isn't in the array but something less than target is.
     # binary search into the array for where target would go if we were to insert it.
 
     here = search_loc(arr, target)
