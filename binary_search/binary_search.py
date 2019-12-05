@@ -27,7 +27,7 @@ def search(arr, target):
     is not defined.
     """
 
-    if not arr:
+    if len(arr) == 0:
         return None
 
     return search_helper(arr, target, 0, len(arr) - 1)
@@ -90,7 +90,7 @@ def search_range(arr, target):
     target.  returns None if target not found.
     """
 
-    if not arr:
+    if len(arr) == 0:
         return None
 
     # look for the leftmost occurrence of target
@@ -103,6 +103,7 @@ def search_range(arr, target):
 
 def search_loc_helper(arr, target, left, right):
     if right < left:
+        # TODO:  will this ever happen?
         return None
 
     m = (left + right) / 2
@@ -128,9 +129,6 @@ def search_loc(arr, target):
     :return: the index of where target would reside in arr if we were to insert it.
     """
 
-    if arr is None:
-        return None
-
     if len(arr) == 0:
         return 0
 
@@ -139,7 +137,6 @@ def search_loc(arr, target):
 
 def search_largest_less_than(arr, target):
     # give me the (leftmost) index of the largest value in a that is strictly less than target.
-    # TODO: need to handle the case where target isn't in the array but something less than target is.
     # binary search into the array for where target would go if we were to insert it.
 
     here = search_loc(arr, target)
@@ -169,7 +166,6 @@ def search_smallest_greater_than(arr, target):
 class BSTest(unittest.TestCase):
 
     def test_search_degenerate(self):
-        self.assertIsNone(search(None, 42))
         self.assertIsNone(search([], 42))
 
     def test_search_exists(self):
@@ -183,7 +179,6 @@ class BSTest(unittest.TestCase):
         self.assertIsNone(search(a, 33))
 
     def test_search_range_degenerate(self):
-        self.assertIsNone(search_range(None, 42))
         self.assertIsNone(search_range([], 42))
 
     def test_search_leftmost(self):
@@ -223,9 +218,6 @@ class BSTest(unittest.TestCase):
         self.assertEqual(9, search_largest_less_than(a, 5))
 
     def test_search_loc_degenerate(self):
-        a = None
-        self.assertIsNone(search_loc(a, 3))
-
         a = []
         self.assertEqual(search_loc(a, 3), 0)
 
