@@ -163,6 +163,13 @@ def search_smallest_greater_than(arr, target):
         return here + 1
 
 
+def search_less_than_or_equal(arr, target):
+    i = search_leftmost(arr, target, 0, len(arr) - 1)
+    if i is None:
+        i = search_largest_less_than(arr, target)
+    return i
+
+
 class BSTest(unittest.TestCase):
 
     def test_search_degenerate(self):
@@ -180,6 +187,18 @@ class BSTest(unittest.TestCase):
 
     def test_search_range_degenerate(self):
         self.assertIsNone(search_range([], 42))
+
+    def test_search_less_than_or_equal(self):
+        a = [1, 3, 6, 10, 15, 21]
+        self.assertIsNone(search_less_than_or_equal(a, 0))
+        self.assertEqual(0, search_less_than_or_equal(a, 1))
+        self.assertEqual(0, search_less_than_or_equal(a, 2))
+        self.assertEqual(2, search_less_than_or_equal(a, 6))
+        self.assertEqual(2, search_less_than_or_equal(a, 7))
+        self.assertEqual(2, search_less_than_or_equal(a, 8))
+        self.assertEqual(2, search_less_than_or_equal(a, 9))
+        self.assertEqual(3, search_less_than_or_equal(a, 10))
+        self.assertEqual(5, search_less_than_or_equal(a, 666))
 
     def test_search_leftmost(self):
         a = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5]
