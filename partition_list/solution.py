@@ -139,3 +139,9 @@ class MyTest(unittest.TestCase):
         l = create_list(arr)
         l = partition_list(l, 10)
         print_list(l)
+
+    def test7(self):
+        arr = [1, 101, 2, 102, 3, 103, 4, 104, 5, 105, 6, 106, 7, 107]
+        l = create_list(arr)
+        l = partition_list(l, 100)
+        print_list(l)
