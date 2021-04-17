@@ -14,19 +14,17 @@ mapping = {
     }
     
 def generate(arr):
-    if len(arr) == 1:
-        for i in mapping[arr[0]]:
-            yield i
-
-    if len(arr) >= 2:
+    if not arr:
+        yield ''
+        
+    elif len(arr) >= 1:
         for i in mapping[arr[0]]:
             for j in generate(arr[1:]):
                 yield i + j
                 
 if __name__ == '__main__':
-    arr = [7, 2, 3]
-    for i in generate(arr):
-        print i,
-    print
+    arr = [2, 3, 4]
+    result = [x for x in generate(arr)]
+    print result
     
     
