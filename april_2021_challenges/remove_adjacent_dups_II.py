@@ -99,4 +99,9 @@ class MyTest(unittest.TestCase):
         new_s = remove_duplicates(s, 3)
         self.assertEqual('aa', new_s)
         
+    def test4(self):
+        s = 'abcd'
+        new_s = remove_duplicates(s, 2)
+        self.assertEqual(s, new_s)
+        
     
