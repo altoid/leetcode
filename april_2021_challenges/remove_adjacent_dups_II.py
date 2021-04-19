@@ -23,14 +23,11 @@ def run_length_encode(s):
     return reduce(rlc_reducer, s, [])
 
 
-def decode_reducer(acc, next_tuple):
-    return acc + next_tuple[0] * next_tuple[1]
-
 def decode(e):
     """
-    given a run-length encoding, produce the string
+    given a run-length encoding, produce the original string
     """
-    return reduce(decode_reducer, e, '')
+    return ''.join([x[0] * x[1] for x in e])
 
     
 def compact_reducer(acc, next_tuple):
