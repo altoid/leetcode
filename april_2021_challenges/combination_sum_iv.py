@@ -9,10 +9,10 @@ class Solution(object):
     def __init__(self):
         self.state = {}
         
-    def combination_sum(self, arr, target):
+    def combinationSum4(self, arr, target):
         # numbers in arr are distinct
     
-        # for each n in arr, return combination_sum(arr, target - n)
+        # for each n in arr, return combinationSum4(arr, target - n)
     
         # enumerate, don't generate
 
@@ -30,7 +30,7 @@ class Solution(object):
                     if target - n < 1:
                         continue
             
-                    result += self.combination_sum(arr, target - n)
+                    result += self.combinationSum4(arr, target - n)
     
             self.state[target] = result
 
@@ -42,12 +42,12 @@ class MyTest(unittest.TestCase):
         soln = Solution()
         arr = [1, 2, 3]
         target = 4
-        self.assertEqual(7, soln.combination_sum(arr, target))
+        self.assertEqual(7, soln.combinationSum4(arr, target))
 
     def test2(self):
         soln = Solution()
         arr = [1, 2]
         target = 2
-        self.assertEqual(2, soln.combination_sum(arr, target))
+        self.assertEqual(2, soln.combinationSum4(arr, target))
 
         
