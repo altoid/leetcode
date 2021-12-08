@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# https://leetcode.com/explore/challenge/card/april-leetcoding-challenge-2021/595/week-3-april-15th-april-21st/3710/
+# https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/
 
 import unittest
+from functools import reduce
 
 
 def rlc_reducer(acc, next_char):
@@ -64,7 +65,10 @@ def compact_encoding(e):
 
 
 def remove_duplicates(s, k):
-
+    """
+    remove runs of any character that are a multiple of k in length.
+    """
+    
     rle = run_length_encode(s)
 
     removed = [x for x in rle if x[1] % k != 0]
@@ -103,5 +107,10 @@ class MyTest(unittest.TestCase):
         s = 'abcd'
         new_s = remove_duplicates(s, 2)
         self.assertEqual(s, new_s)
+                
+    def test5(self):
+        s = 'azxxzy'
+        new_s = remove_duplicates(s, 2)
+        self.assertEqual('ay', new_s)
         
     
