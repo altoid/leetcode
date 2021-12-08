@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# https://leetcode.com/explore/challenge/card/april-leetcoding-challenge-2021/593/week-1-april-1st-april-7th/3694/
+# https://leetcode.com/problems/ones-and-zeroes/
 
 # evaluate # 0s and 1s in each string
 
@@ -11,6 +11,10 @@ import unittest
 # eliminate every tuple where 0s > m or 1s > n
 # see if the remainder satisfies the condition
 # if it doesn't, keep removing the tuple with the biggest 0 or 1 component until it does.
+#
+# needs a DP solution:  remove the tuple with the largest 0 component
+# and again with thet largest 1 component and see which one wins.
+# proceed recursively on the results until we find a winner.
 
 def mycmp(a, b):
     """
@@ -37,26 +41,13 @@ def bitstring_encode(bitstring):
 class Solution(object):
 
     def findMaxForm(self, strs, m_zeroes, n_ones):
-        encoded = map(bitstring_encode, strs)
-        encoded = [x for x in encoded if x[0] <= m_zeroes and x[1] <= n_ones]
-
-        # sort by the biggest component of the tuple
-        encoded = sorted(encoded, cmp=mycmp)
-
-        m, n = sum([x[0] for x in encoded]), sum([x[1] for x in encoded])
-        while m > m_zeroes or n > n_ones:
-            # remove the item that has the smallest effect on min(m, n)
-            last = encoded.pop()
-            m -= last[0]
-            n -= last[1]
-
-        return len(encoded)
-
+        # threw away original solution, needs a redo
+        return 0
 
 if __name__ == '__main__':
     strs = ["10", "0001", "111001", "1", "0"]
     soln = Solution()
-    print soln.findMaxForm(strs, 5, 3)
+    print(soln.findMaxForm(strs, 5, 3))
 
 
 class MyTest(unittest.TestCase):
@@ -88,5 +79,5 @@ class MyTest(unittest.TestCase):
 
     def test3(self):
         soln = Solution()
-        strs = ["111","1000","1000","1000"]
+        strs = ["111", "1000", "1000", "1000"]
         self.assertEqual(3, soln.findMaxForm(strs, 9, 3))

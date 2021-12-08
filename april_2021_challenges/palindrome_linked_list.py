@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import unittest
 
-# https://leetcode.com/explore/challenge/card/april-leetcoding-challenge-2021/593/week-1-april-1st-april-7th/3693/
+# https://leetcode.com/problems/palindrome-linked-list/
 
 # solution that uses O(1) space.
 #
@@ -29,10 +29,10 @@ def print_list(head):
     lst = []
     while p:
         lst.append(p.value)
-        p = p.next
+        p = p.__next__
 
-    slst = map(str, lst)
-    print "<%s>" % ", ".join(slst)
+    slst = list(map(str, lst))
+    print("<%s>" % ", ".join(slst))
 
 
 def length(lst):
@@ -41,7 +41,7 @@ def length(lst):
     p = lst
     while p:
         l += 1
-        p = p.next
+        p = p.__next__
 
     return l
 
@@ -55,14 +55,14 @@ def find_middle(lst):
     stophere = (l + 1) // 2
 
     p = lst
-    for c in xrange(stophere - 1):
-        p = p.next
+    for c in range(stophere - 1):
+        p = p.__next__
 
     return p
 
 def is_palindrome(lst):
     m = find_middle(lst)
-    rest = m.next
+    rest = m.__next__
     m.next = None
 
     prev = None
@@ -70,7 +70,7 @@ def is_palindrome(lst):
     next = None
     
     while curr:
-        next = curr.next
+        next = curr.__next__
         curr.next = prev
         prev = curr
         curr = next
@@ -83,8 +83,8 @@ def is_palindrome(lst):
     while prest:
         if plst.value != prest.value:
             return False
-        plst = plst.next
-        prest = prest.next
+        plst = plst.__next__
+        prest = prest.__next__
 
     return True
     
