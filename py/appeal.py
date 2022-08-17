@@ -15,7 +15,6 @@ from pprint import pprint
 class Solution:
 
     def __init__(self):
-        self.substring_appeal = {}
         self.table = {}
 
     def make_table(self, text):
@@ -53,33 +52,29 @@ class Solution:
                 self.table[letter][i] = v
                 i += 1
 
-        pprint(self.table)
+    def count_unique_chars(self, start, end):
+        """
+        start and end are the indexes (1-based) of the first and last chars of the substring.
 
-    def count_unique_chars(self, s):
-        char_counts = {}
+        for each unique letter in the substring, find table[letter][end] - table[letter][start - 1].
+        the number of letters for which this is > 0 is the number of unique letters in the substring.
+        """
 
-        if s not in self.substring_appeal:
-
-            for c in s:
-                if c not in char_counts:
-                    char_counts[c] = 0
-
-                char_counts[c] += 1
-
-            self.substring_appeal[s] = len(char_counts)
-
-    #    print(s, substring_appeal[s])
-        return self.substring_appeal[s]
+        total = 0
+        for k in self.table.keys():
+            if self.table[k][end] > self.table[k][start - 1]:
+                total += 1
+        return total
 
     def appealSum(self, text: str) -> int:
+        self.make_table(text)
         l = len(text)
 
         total = 0
 
         for i in range(0, l):
             for j in range(i + 1, l + 1):
-                substring = text[i:j]
-                total += self.count_unique_chars(substring)
+                total += self.count_unique_chars(i + 1, j)
 
         return total
 
@@ -97,10 +92,14 @@ class MyTest(unittest.TestCase):
         self.s.make_table(text)
 
     def test_count_unique_1(self):
-        self.assertEqual(3, self.s.count_unique_chars('abbca'))
+        text = 'abbca'
+        self.s.make_table(text)
+        self.assertEqual(3, self.s.count_unique_chars(1, len(text)))
 
     def test_count_unique_2(self):
-        self.assertEqual(3, self.s.count_unique_chars(''.join(random.choices('abc', k=20))))
+        text = ''.join(random.choices('abc', k=20))
+        self.s.make_table(text)
+        self.assertEqual(3, self.s.count_unique_chars(1, len(text)))
 
     def test_appeal_1(self):
         self.assertEqual(28, self.s.appealSum('abbca'))
