@@ -38,6 +38,8 @@ class Solution:
         f:   0  1  1  1  1  1  1  7  7  7  7  7  7
         i:   0  0  2  2  2  2  2  2  2  2  2  2  2
         l:   0  0  0  0  0  5  5  5  5  5  5 11 11
+
+        the answer is the sum of all of the numbers in the table.
         """
 
         # maps unique letters to their arrays
@@ -52,30 +54,15 @@ class Solution:
                 self.table[letter][i] = v
                 i += 1
 
-    def count_unique_chars(self, start, end):
-        """
-        start and end are the indexes (1-based) of the first and last chars of the substring.
-
-        for each unique letter in the substring, find table[letter][end] - table[letter][start - 1].
-        the number of letters for which this is > 0 is the number of unique letters in the substring.
-        """
-
-        total = 0
-        for k in self.table.keys():
-            if self.table[k][end] > self.table[k][start - 1]:
-                total += 1
-        return total
+        #pprint(self.table)
 
     def appealSum(self, text: str) -> int:
         self.make_table(text)
         l = len(text)
 
         total = 0
-
-        for i in range(0, l):
-            for j in range(i + 1, l + 1):
-                total += self.count_unique_chars(i + 1, j)
-
+        for v in self.table.values():
+            total += sum(v)
         return total
 
 
@@ -90,16 +77,6 @@ class MyTest(unittest.TestCase):
     def test_make_table(self):
         text = 'fiddlefaddle'
         self.s.make_table(text)
-
-    def test_count_unique_1(self):
-        text = 'abbca'
-        self.s.make_table(text)
-        self.assertEqual(3, self.s.count_unique_chars(1, len(text)))
-
-    def test_count_unique_2(self):
-        text = ''.join(random.choices('abc', k=20))
-        self.s.make_table(text)
-        self.assertEqual(3, self.s.count_unique_chars(1, len(text)))
 
     def test_appeal_1(self):
         self.assertEqual(28, self.s.appealSum('abbca'))
