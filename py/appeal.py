@@ -14,10 +14,7 @@ from pprint import pprint
 
 class Solution:
 
-    def __init__(self):
-        self.table = {}
-
-    def make_table(self, text):
+    def appealSum(self, text):
         """
         for each unique letter in the text, create an array.  the length is 1 + len(text).  initialized to all
         zeroes.  the values in a letter's array are the index (1 based) of the last appearance at or before i.
@@ -40,27 +37,21 @@ class Solution:
         l:   0  0  0  0  0  5  5  5  5  5  5 11 11
 
         the answer is the sum of all of the numbers in the table.
+
+        UPDATE:  changed code to compute the answer this way but without using the table.
         """
 
-        # maps unique letters to their arrays
         unique_letters = set(text)
+        total = 0
         for letter in unique_letters:
-            self.table[letter] = [0] * len(text)
-            i = 0
+            i = 1
             v = 0
             for t in text:
                 if t == letter:
                     v = i
-                self.table[letter][i] = v
+                total += v
                 i += 1
 
-    def appealSum(self, text: str) -> int:
-        self.make_table(text)
-        l = len(text)
-
-        total = 0
-        for v in self.table.values():
-            total += sum(v)
         return total
 
 
@@ -72,12 +63,7 @@ class MyTest(unittest.TestCase):
     def setUp(self) -> None:
         self.s = Solution()
 
-    def test_make_table(self):
-        text = 'fiddlefaddle'
-        self.s.make_table(text)
-
     def test_appeal_1(self):
         self.assertEqual(28, self.s.appealSum('abbca'))
-
-    def test_appeal_2(self):
         self.assertEqual(20, self.s.appealSum('code'))
+        self.assertEqual(272, self.s.appealSum('fiddlefaddle'))
