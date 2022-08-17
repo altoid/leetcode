@@ -45,16 +45,14 @@ class Solution:
         # maps unique letters to their arrays
         unique_letters = set(text)
         for letter in unique_letters:
-            self.table[letter] = [0] * (1 + len(text))
-            i = 1
+            self.table[letter] = [0] * len(text)
+            i = 0
             v = 0
             for t in text:
                 if t == letter:
                     v = i
                 self.table[letter][i] = v
                 i += 1
-
-        #pprint(self.table)
 
     def appealSum(self, text: str) -> int:
         self.make_table(text)
