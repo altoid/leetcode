@@ -2,9 +2,6 @@
 
 # https://leetcode.com/contest/weekly-contest-291/problems/total-appeal-of-a-string/
 
-# approach:  look at every fucking substring.  use dynamic programming to keep track of substrings that we
-# have already seen
-
 import unittest
 import random
 from pprint import pprint
