@@ -18,5 +18,5 @@ class MyTest(unittest.TestCase):
     def setUp(self) -> None:
         self.s = Solution()
 
-    def test_appeal_1(self):
+    def test_1(self):
         pass
