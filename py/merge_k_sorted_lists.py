@@ -66,28 +66,26 @@ def merge_2(l1, l2):
         if p1 and p2:
             if p1.val < p2.val:
                 n = p1
-                n.next = None
                 p1 = p1next
                 if p1next:
                     p1next = p1.next
             else:
                 n = p2
-                n.next = None
                 p2 = p2next
                 if p2next:
                     p2next = p2.next
         elif p1:
             n = p1
-            n.next = None
             p1 = p1next
             if p1next:
                 p1next = p1.next
         else:
             n = p2
-            n.next = None
             p2 = p2next
             if p2next:
                 p2next = p2.next
+
+        n.next = None
 
         if not head:
             head = tail = n
