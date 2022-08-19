@@ -59,24 +59,30 @@ class Solution:
     def merge_2(self, l1, l2):
         p1 = l1
         p2 = l2
-        prev = None
+        head = tail = None
+
         while p1 or p2:
             if p1 and p2:
                 if p1.val < p2.val:
-                    n = ListNode(p1.val, prev)
+                    n = ListNode(p1.val)
                     p1 = p1.next
                 else:
-                    n = ListNode(p2.val, prev)
+                    n = ListNode(p2.val)
                     p2 = p2.next
             elif p1:
-                n = ListNode(p1.val, prev)
+                n = ListNode(p1.val)
                 p1 = p1.next
             else:
-                n = ListNode(p2.val, prev)
+                n = ListNode(p2.val)
                 p2 = p2.next
-            prev = n
 
-        return reverse(prev)
+            if not head:
+                head = tail = n
+            else:
+                tail.next = n
+                tail = n
+
+        return head
 
     def helper(self, lists, start, end):
         if end - start < 2:
