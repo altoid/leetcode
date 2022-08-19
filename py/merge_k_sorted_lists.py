@@ -55,29 +55,16 @@ def reverse(ll):
     return p1
 
 
-class Solution:
-    def merge_2(self, l1, l2):
-        p1 = l1
-        p1next = p1.next if p1 else None
-        p2 = l2
-        p2next = p2.next if p2 else None
-        head = tail = None
+def merge_2(l1, l2):
+    p1 = l1
+    p1next = p1.next if p1 else None
+    p2 = l2
+    p2next = p2.next if p2 else None
+    head = tail = None
 
-        while p1 or p2:
-            if p1 and p2:
-                if p1.val < p2.val:
-                    n = p1
-                    n.next = None
-                    p1 = p1next
-                    if p1next:
-                        p1next = p1.next
-                else:
-                    n = p2
-                    n.next = None
-                    p2 = p2next
-                    if p2next:
-                        p2next = p2.next
-            elif p1:
+    while p1 or p2:
+        if p1 and p2:
+            if p1.val < p2.val:
                 n = p1
                 n.next = None
                 p1 = p1next
@@ -89,28 +76,43 @@ class Solution:
                 p2 = p2next
                 if p2next:
                     p2next = p2.next
+        elif p1:
+            n = p1
+            n.next = None
+            p1 = p1next
+            if p1next:
+                p1next = p1.next
+        else:
+            n = p2
+            n.next = None
+            p2 = p2next
+            if p2next:
+                p2next = p2.next
 
-            if not head:
-                head = tail = n
-            else:
-                tail.next = n
-                tail = n
+        if not head:
+            head = tail = n
+        else:
+            tail.next = n
+            tail = n
 
-        return head
+    return head
 
-    def helper(self, lists, start, end):
-        if end - start < 2:
-            return lists[start]
 
-        if end == start + 2:
-            return self.merge_2(lists[start], lists[start + 1])
+def helper(lists, start, end):
+    if end - start < 2:
+        return lists[start]
 
-        m = (start + end) // 2
-        return self.merge_2(self.helper(lists, start, m), self.helper(lists, m, end))
+    if end == start + 2:
+        return merge_2(lists[start], lists[start + 1])
 
+    m = (start + end) // 2
+    return merge_2(helper(lists, start, m), helper(lists, m, end))
+
+
+class Solution:
     def mergeKLists(self, lists):
         if lists:
-            return self.helper(lists, 0, len(lists))
+            return helper(lists, 0, len(lists))
         return None
 
 
@@ -145,7 +147,7 @@ class MyTest(unittest.TestCase):
     def merge(self, a, b):
         lla = to_linked_list(a)
         llb = to_linked_list(b)
-        llresult = self.s.merge_2(lla, llb)
+        llresult = merge_2(lla, llb)
         control = sorted(a + b)
         test = ll_to_list(llresult)
         self.assertEqual(control, test)
