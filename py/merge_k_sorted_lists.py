@@ -57,6 +57,12 @@ class ListState(object):
     def __repr__(self):
         return str(self)
 
+    def key(self):
+        # for passing as key function to sorts, etc
+        if self.ptr:
+            return 0, self.ptr.val
+        return 1, 0
+
 
 class Solution:
     def mergeKLists(self, lists):
@@ -64,20 +70,22 @@ class Solution:
 
         result = []
         # get all the valid status
-        valid = list(filter(lambda x: x.valid(), states))
 
         # return the min value among the valid lists
-        while len(valid) > 0:
+        done = False
+        while not done > 0:
             # pprint(result)
-            # pprint(states)
-            m = min(valid, key=lambda x: x.current_item())
+            pprint(states)
+            m = min(states, key=lambda x: x.key())
+            if not m.valid():
+                done = True
+                continue
+
             # pprint(m)
             result.append(m.current_item())
             m.increment()
 
-            valid = list(filter(lambda x: x.valid(), states))
-
-        # pprint(states)
+        pprint(states)
         # pprint(result)
         return to_linked_list(result)
 
