@@ -36,59 +36,50 @@ def ll_to_list(ll):
     return real
 
 
-class ListState(object):
-    def __init__(self, lst):
-        self.ptr = lst
-        self.lst = lst
+def reverse(ll):
+    """
+    reverse the linked list; this modifies the list by changing all the pointers.
+    """
 
-    def valid(self):
-        return bool(self.ptr)
+    p0 = None
+    p1 = ll
+    p2 = ll.next if ll else None
 
-    def current_item(self):
-        return self.ptr.val
-
-    def increment(self):
-        if self.ptr:
-            self.ptr = self.ptr.next
-
-    def __str__(self):
-        return "{%s - %s}" % (ll_to_string(self.lst), self.ptr.val if self.ptr else "<>")
-
-    def __repr__(self):
-        return str(self)
-
-    def key(self):
-        # for passing as key function to sorts, etc
-        if self.ptr:
-            return 0, self.ptr.val
-        return 1, 0
+    while p2:
+        p1.next = p0
+        p0 = p1
+        p1 = p2
+        p2 = p2.next
+    p1.next = p0
+    return p1
 
 
 class Solution:
+    def merge_2(self, l1, l2):
+        p1 = l1
+        p2 = l2
+        prev = None
+        while p1 or p2:
+            if p1 and p2:
+                if p1.val < p2.val:
+                    n = ListNode(p1.val, prev)
+                    p1 = p1.next
+                else:
+                    n = ListNode(p2.val, prev)
+                    p2 = p2.next
+            elif p1:
+                n = ListNode(p1.val, prev)
+                p1 = p1.next
+            else:
+                n = ListNode(p2.val, prev)
+                p2 = p2.next
+            prev = n
+
+        return reverse(prev)
+
+
     def mergeKLists(self, lists):
-        states = [ListState(l) for l in lists]
-
-        result = []
-        # get all the valid status
-
-        # return the min value among the valid lists
-        done = False
-        while not done > 0:
-            # pprint(result)
-            pprint(states)
-            m = min(states, key=lambda x: x.key())
-            if not m.valid():
-                done = True
-                continue
-
-            # pprint(m)
-            result.append(m.current_item())
-            m.increment()
-
-        pprint(states)
-        # pprint(result)
-        return to_linked_list(result)
-
+        pass
 
 if __name__ == '__main__':
     pass
@@ -97,6 +88,11 @@ if __name__ == '__main__':
 class MyTest(unittest.TestCase):
     def setUp(self) -> None:
         self.s = Solution()
+
+    def test_reverse_1(self):
+        ll = to_linked_list([1, 2, 3, 4, 5])
+        r = reverse(ll)
+        self.assertEqual([5, 4, 3, 2, 1], ll_to_list(r))
 
     def test_ll_1(self):
         lst = [1, 2, 3, 4]
@@ -113,34 +109,29 @@ class MyTest(unittest.TestCase):
         ll = to_linked_list(lst)
         self.assertEqual("[]", ll_to_string(ll))
 
-    def test_list_state_1(self):
-        l = to_linked_list([1])
-        ls = ListState(l)
-        self.assertTrue(ls.valid())
-        ls.increment()
-        self.assertFalse(ls.valid())
-
-    def test_list_state_2(self):
-        l = to_linked_list([])
-        ls = ListState(l)
-        self.assertFalse(ls.valid())
-
-    def test_list_state_3(self):
-        l = to_linked_list([1, 2])
-        ls = ListState(l)
-        self.assertTrue(ls.valid())
-        self.assertEqual(1, ls.current_item())
-        ls.increment()
-        self.assertEqual(2, ls.current_item())
-        self.assertTrue(ls.valid())
-
     def test_merge_1(self):
         lists = [[1, 4, 5], [1, 3, 4], [2, 6]]
-
         lists = map(lambda x: to_linked_list(x), lists)
+
         self.assertEqual([1, 1, 2, 3, 4, 4, 5, 6], ll_to_list(self.s.mergeKLists(lists)))
 
     def test_merge_2(self):
         lists = [[]]
+        lists = map(lambda x: to_linked_list(x), lists)
 
         self.assertEqual([], ll_to_list(self.s.mergeKLists(lists)))
+
+    def test_merge_3(self):
+        lists = [[], []]
+        lists = map(lambda x: to_linked_list(x), lists)
+
+        self.assertEqual([], ll_to_list(self.s.mergeKLists(lists)))
+
+    def test_merge_4(self):
+        lists = [[1], []]
+        lists = map(lambda x: to_linked_list(x), lists)
+
+        self.assertEqual([1], ll_to_list(self.s.mergeKLists(lists)))
+
+    def test_merge_null(self):
+        self.assertEqual([], ll_to_list(self.s.mergeKLists([None])))
