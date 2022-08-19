@@ -95,7 +95,9 @@ class Solution:
         return self.merge_2(self.helper(lists, start, m), self.helper(lists, m, end))
 
     def mergeKLists(self, lists):
-        return self.helper(lists, 0, len(lists))
+        if lists:
+            return self.helper(lists, 0, len(lists))
+        return None
 
 
 if __name__ == '__main__':
@@ -187,6 +189,11 @@ class MyTest(unittest.TestCase):
         lists = list(map(lambda x: to_linked_list(x), lists))
 
         self.assertEqual([1, 1, 1, 2, 2, 5, 7, 9], ll_to_list(self.s.mergeKLists(lists)))
+
+    def test_merge_6(self):
+        lists = []
+        self.assertIsNone(self.s.mergeKLists(lists))
+
 
     def test_merge_null(self):
         self.assertEqual([], ll_to_list(self.s.mergeKLists([None])))
