@@ -2,6 +2,13 @@
 
 # https://leetcode.com/problems/merge-k-sorted-lists/
 
+# idea:  divide and conquer.  chop the list of lists in half and process each half separately then merge the results.
+# the basis case is we have
+#
+# 0 lists - do nothing
+# 1 list - return it without further action
+# 2 lists - merge them, this is easy; return the merged list
+# more than 2 lists - recur.
 
 import unittest
 from pprint import pprint
