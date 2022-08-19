@@ -50,7 +50,8 @@ def reverse(ll):
         p0 = p1
         p1 = p2
         p2 = p2.next
-    p1.next = p0
+    if p1:
+        p1.next = p0
     return p1
 
 
@@ -93,6 +94,38 @@ class MyTest(unittest.TestCase):
         ll = to_linked_list([1, 2, 3, 4, 5])
         r = reverse(ll)
         self.assertEqual([5, 4, 3, 2, 1], ll_to_list(r))
+
+    def test_reverse_2(self):
+        ll = to_linked_list([1])
+        r = reverse(ll)
+        self.assertEqual([1], ll_to_list(r))
+
+    def test_reverse_3(self):
+        ll = to_linked_list([1, 2])
+        r = reverse(ll)
+        self.assertEqual([2, 1], ll_to_list(r))
+
+    def test_reverse_4(self):
+        ll = to_linked_list([])
+        r = reverse(ll)
+        self.assertEqual([], ll_to_list(r))
+
+    def merge(self, a, b):
+        lla = to_linked_list(a)
+        llb = to_linked_list(b)
+        llresult = self.s.merge_2(lla, llb)
+        control = sorted(a + b)
+        test = ll_to_list(llresult)
+        self.assertEqual(control, test)
+
+    def test_merge_2_1(self):
+        self.merge([1, 2, 3], [4, 5, 6])
+        self.merge([1], [4, 5, 6])
+        self.merge([1, 2, 3], [4])
+        self.merge([1], [4])
+        self.merge([], [4, 5, 6])
+        self.merge([1, 2, 3], [])
+        self.merge([], [])
 
     def test_ll_1(self):
         lst = [1, 2, 3, 4]
