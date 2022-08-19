@@ -78,9 +78,19 @@ class Solution:
 
         return reverse(prev)
 
+    def helper(self, lists, start, end):
+        if end - start < 2:
+            return lists[start]
+
+        if end == start + 2:
+            return self.merge_2(lists[start], lists[start + 1])
+
+        m = (start + end) // 2
+        return self.merge_2(self.helper(lists, start, m), self.helper(lists, m, end))
 
     def mergeKLists(self, lists):
-        pass
+        return self.helper(lists, 0, len(lists))
+
 
 if __name__ == '__main__':
     pass
@@ -144,27 +154,33 @@ class MyTest(unittest.TestCase):
 
     def test_merge_1(self):
         lists = [[1, 4, 5], [1, 3, 4], [2, 6]]
-        lists = map(lambda x: to_linked_list(x), lists)
+        lists = list(map(lambda x: to_linked_list(x), lists))
 
         self.assertEqual([1, 1, 2, 3, 4, 4, 5, 6], ll_to_list(self.s.mergeKLists(lists)))
 
     def test_merge_2(self):
         lists = [[]]
-        lists = map(lambda x: to_linked_list(x), lists)
+        lists = list(map(lambda x: to_linked_list(x), lists))
 
         self.assertEqual([], ll_to_list(self.s.mergeKLists(lists)))
 
     def test_merge_3(self):
         lists = [[], []]
-        lists = map(lambda x: to_linked_list(x), lists)
+        lists = list(map(lambda x: to_linked_list(x), lists))
 
         self.assertEqual([], ll_to_list(self.s.mergeKLists(lists)))
 
     def test_merge_4(self):
         lists = [[1], []]
-        lists = map(lambda x: to_linked_list(x), lists)
+        lists = list(map(lambda x: to_linked_list(x), lists))
 
         self.assertEqual([1], ll_to_list(self.s.mergeKLists(lists)))
+
+    def test_merge_5(self):
+        lists = [[1], [7], [2], [9], [5], [1], [1], [2]]
+        lists = list(map(lambda x: to_linked_list(x), lists))
+
+        self.assertEqual([1, 1, 1, 2, 2, 5, 7, 9], ll_to_list(self.s.mergeKLists(lists)))
 
     def test_merge_null(self):
         self.assertEqual([], ll_to_list(self.s.mergeKLists([None])))
