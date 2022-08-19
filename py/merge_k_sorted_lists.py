@@ -13,11 +13,27 @@ class ListNode:
         self.val = val
         self.next = next
 
-    # def __str__(self):
-    #     return "%s" % self.val
-    #
-    # def __repr__(self):
-    #     return str(self)
+
+def to_linked_list(l):
+    prev = None
+    for x in reversed(l):
+        n = ListNode(x, prev)
+        prev = n
+    return prev
+
+
+def ll_to_string(ll):
+    return str(ll_to_list(ll))
+
+
+def ll_to_list(ll):
+    real = []
+    n = ll
+    while n:
+        real.append(n.val)
+        n = n.next
+
+    return real
 
 
 class ListState(object):
@@ -42,24 +58,6 @@ class ListState(object):
         return str(self)
 
 
-def to_linked_list(l):
-    prev = None
-    for x in reversed(l):
-        n = ListNode(x, prev)
-        prev = n
-    return prev
-
-
-def ll_to_string(ll):
-    real = []
-    n = ll
-    while n:
-        real.append(n.val)
-        n = n.next
-
-    return str(real)
-
-
 class Solution:
     def mergeKLists(self, lists):
         states = [ListState(l) for l in lists]
@@ -70,18 +68,18 @@ class Solution:
 
         # return the min value among the valid lists
         while len(valid) > 0:
-            pprint(result)
-            pprint(states)
+            # pprint(result)
+            # pprint(states)
             m = min(valid, key=lambda x: x.current_item())
-            pprint(m)
+            # pprint(m)
             result.append(m.current_item())
             m.increment()
 
             valid = list(filter(lambda x: x.valid(), states))
 
-        pprint(states)
-        pprint(result)
-        return result
+        # pprint(states)
+        # pprint(result)
+        return to_linked_list(result)
 
 
 if __name__ == '__main__':
@@ -132,9 +130,9 @@ class MyTest(unittest.TestCase):
         lists = [[1, 4, 5], [1, 3, 4], [2, 6]]
 
         lists = map(lambda x: to_linked_list(x), lists)
-        self.assertEqual([1, 1, 2, 3, 4, 4, 5, 6], self.s.mergeKLists(lists))
+        self.assertEqual([1, 1, 2, 3, 4, 4, 5, 6], ll_to_list(self.s.mergeKLists(lists)))
 
     def test_merge_2(self):
         lists = [[]]
 
-        self.assertEqual([], self.s.mergeKLists(lists))
+        self.assertEqual([], ll_to_list(self.s.mergeKLists(lists)))
