@@ -58,23 +58,37 @@ def reverse(ll):
 class Solution:
     def merge_2(self, l1, l2):
         p1 = l1
+        p1next = p1.next if p1 else None
         p2 = l2
+        p2next = p2.next if p2 else None
         head = tail = None
 
         while p1 or p2:
             if p1 and p2:
                 if p1.val < p2.val:
-                    n = ListNode(p1.val)
-                    p1 = p1.next
+                    n = p1
+                    n.next = None
+                    p1 = p1next
+                    if p1next:
+                        p1next = p1.next
                 else:
-                    n = ListNode(p2.val)
-                    p2 = p2.next
+                    n = p2
+                    n.next = None
+                    p2 = p2next
+                    if p2next:
+                        p2next = p2.next
             elif p1:
-                n = ListNode(p1.val)
-                p1 = p1.next
+                n = p1
+                n.next = None
+                p1 = p1next
+                if p1next:
+                    p1next = p1.next
             else:
-                n = ListNode(p2.val)
-                p2 = p2.next
+                n = p2
+                n.next = None
+                p2 = p2next
+                if p2next:
+                    p2next = p2.next
 
             if not head:
                 head = tail = n
