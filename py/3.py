@@ -10,6 +10,7 @@ from pprint import pprint
 
 
 def solution(mystr):
+    # record the last position at which we see each character
     characters_seen = {}
     current_run = 0
     longest_run = 0
@@ -17,28 +18,32 @@ def solution(mystr):
     p = 0
     for c in mystr:
         if c not in characters_seen:
-            characters_seen[c] = []
-            characters_seen[c].append(p)
+            characters_seen[c] = p
             current_run += 1
         else:
             # this is a character we've seen before.
             # if the current character last occurred later than the last repeated character,
             # the streak is broken.  otherwise, keep it going.
 
-            if last_repeated_char <= characters_seen[c][-1]:
-                last_repeated_char = characters_seen[c][-1]
+            if last_repeated_char <= characters_seen[c]:
+                last_repeated_char = characters_seen[c]
                 longest_run = max(current_run, longest_run)
                 current_run = p - last_repeated_char
             else:
                 current_run += 1
 
-            characters_seen[c].append(p)
+            characters_seen[c] = p
 
         p += 1
 
     longest_run = max(longest_run, current_run)
 
     return longest_run
+
+
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        return solution(s)
 
 
 class MyTest(unittest.TestCase):
