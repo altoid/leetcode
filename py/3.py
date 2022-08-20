@@ -13,7 +13,7 @@ def solution(str):
     characters_seen = {}
     current_run = 0
     longest_run = 0
-    last_repeated_char = None
+    last_repeated_char = 0
     p = 0
     for c in str:
         if c not in characters_seen:
@@ -22,25 +22,22 @@ def solution(str):
             current_run += 1
         else:
             # this is a character we've seen before.
-            if not last_repeated_char:
+            # if the current character last occurred later than the last repeated character,
+            # the streak is broken.  otherwise, keep it going.
+
+            if last_repeated_char <= characters_seen[c][-1]:
                 last_repeated_char = characters_seen[c][-1]
                 longest_run = max(current_run, longest_run)
                 current_run = p - last_repeated_char
             else:
-                # if the current character last occurred earlier than the last repeated character,
-                # the streak is unbroken.
-                if last_repeated_char < characters_seen[c][-1]:
-                    last_repeated_char = characters_seen[c][-1]
-                    longest_run = max(current_run, longest_run)
-                    current_run = p - last_repeated_char
-                else:
-                    current_run += 1
+                current_run += 1
+
             characters_seen[c].append(p)
 
         p += 1
 
     longest_run = max(longest_run, current_run)
-    
+
     return longest_run
 
 
