@@ -9,13 +9,13 @@ import unittest
 from pprint import pprint
 
 
-def solution(str):
+def solution(mystr):
     characters_seen = {}
     current_run = 0
     longest_run = 0
     last_repeated_char = 0
     p = 0
-    for c in str:
+    for c in mystr:
         if c not in characters_seen:
             characters_seen[c] = []
             characters_seen[c].append(p)
@@ -56,3 +56,10 @@ class MyTest(unittest.TestCase):
 
     def test_5(self):
         self.assertEqual(7, solution("abcdefg"))
+
+    def test_6(self):
+        self.assertEqual(3, solution("abcabcbb"))
+
+    def test_7(self):
+        self.assertEqual(3, solution("pwwkew"))
+
