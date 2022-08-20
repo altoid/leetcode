@@ -5,31 +5,50 @@
 # Given a string, find the length of the longest substring without repeating characters.
 # in case of a tie, earliest substring wins.
 
-def nonrepeating_substring_at(s, p):
-    # returns (p, length_of_substring_at_p)
-    tally = set()
-    substring_len = 0
-    for c in s[p:]:
-        if c in tally:
-            break
-        tally.add(c)
-        substring_len += 1
-    return (p, substring_len)
+import unittest
+from pprint import pprint
 
-def mylen(l):
-    return len(l)
 
-def length_of_longest_substring(s):
-    maxlen = 0
-    # len will be evaluated just once
-    for i in xrange(mylen(s)):
-        idx, len_at_idx = nonrepeating_substring_at(s, i)
-        maxlen = max(maxlen, len_at_idx)
-    return maxlen
+def solution(str):
+    characters_seen = {}
+    current_run = 0
+    longest_run = 0
+    last_repeated_char = None
+    p = 0
+    for c in str:
+        if c not in characters_seen:
+            characters_seen[c] = []
+            characters_seen[c].append(p)
+            current_run += 1
+        else:
+            # this is a character we've seen before.
+            if not last_repeated_char:
+                last_repeated_char = characters_seen[c][-1]
+                longest_run = max(current_run, longest_run)
+                current_run = p - last_repeated_char
+            else:
+                # if the current character last occurred earlier than the last repeated character,
+                # the streak is unbroken.
+                if last_repeated_char < characters_seen[c][-1]:
+                    last_repeated_char = characters_seen[c][-1]
+                    longest_run = max(current_run, longest_run)
+                    current_run = p - last_repeated_char
+                else:
+                    current_run += 1
+            characters_seen[c].append(p)
 
-if __name__ == '__main__':
-    trials = ['bbbbb', 'abcabcbb', 'pwwkew',
-              'abcarxwy',
-              ]
-    for s in trials:
-        print s, length_of_longest_substring(s)
+        p += 1
+
+    return longest_run
+
+
+class MyTest(unittest.TestCase):
+    def test_1(self):
+        self.assertEqual(8, solution("whathathgodwrought"))
+
+    @unittest.skip
+    def test_2(self):
+        self.assertEqual(1, solution("w"))
+        self.assertEqual(0, solution(""))
+        self.assertEqual(1, solution("wwwwwww"))
+        self.assertEqual(7, solution("abcdefg"))
