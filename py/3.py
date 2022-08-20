@@ -39,6 +39,8 @@ def solution(str):
 
         p += 1
 
+    longest_run = max(longest_run, current_run)
+    
     return longest_run
 
 
@@ -46,9 +48,14 @@ class MyTest(unittest.TestCase):
     def test_1(self):
         self.assertEqual(8, solution("whathathgodwrought"))
 
-    @unittest.skip
     def test_2(self):
         self.assertEqual(1, solution("w"))
+
+    def test_3(self):
         self.assertEqual(0, solution(""))
+
+    def test_4(self):
         self.assertEqual(1, solution("wwwwwww"))
+
+    def test_5(self):
         self.assertEqual(7, solution("abcdefg"))
