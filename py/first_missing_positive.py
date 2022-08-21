@@ -75,6 +75,7 @@ from pprint import pprint
 
 def solution(arr):
     # we are guaranteed that the array is nonempty.
+    n = len(arr)
     mx = max(arr)
     mn = min(arr)
     if mx < 1:
@@ -82,12 +83,17 @@ def solution(arr):
     if mn > 1:
         return 1
 
+    # find the smallest positive value
     mp = mx
     for x in arr:
         if x < 1:
             continue
         mp = min(x, mp)
-    n = len(arr)
+
+    if mp > 1:
+        return 1
+    
+    # find the largest positive value <= the size of the array.
     mr = mp
     for x in arr:
         if x > n:
@@ -96,6 +102,7 @@ def solution(arr):
             continue
         mr = max(mr, x)
 
+    # scrub the array so that all the values are in the range 1 .. n.
     # we should really make a copy of the list but the constraints are to have O(1) storage.
     j = 0
     while j < n:
@@ -103,7 +110,7 @@ def solution(arr):
         arr[j] = min(arr[j], mr)
         j += 1
 
-    # pprint(arr)
+    pprint(arr)
 
     # pretend everything is 1-based
     for i in range(1, n + 1):
@@ -116,8 +123,10 @@ def solution(arr):
         while arr[terminus - 1] != 0:
             origin = terminus
             terminus = arr[terminus - 1]
+
+            # once we know that this array position is mapped to, we can clear it.
             arr[origin - 1] = 0
-        # pprint(arr)
+        pprint(arr)
 
     # find the index of the first nonzero item in the array.  if the are all zero,
     # then the answer is n + 1
@@ -131,7 +140,8 @@ def solution(arr):
 
 
 class Solution:
-    pass
+    def firstMissingPositive(self, nums):
+        return solution(nums)
 
 
 if __name__ == '__main__':
@@ -141,6 +151,10 @@ if __name__ == '__main__':
 class MyTest(unittest.TestCase):
     def setUp(self) -> None:
         self.s = Solution()
+
+    def test_12(self):
+        arr = [-1,-2,-60,40,43]
+        self.assertEqual(1, solution(arr))
 
     def test_1(self):
         arr = [-5, -3, -1, 1, 3, 5, 7, 9, 11]
@@ -183,5 +197,5 @@ class MyTest(unittest.TestCase):
         self.assertEqual(1, solution(arr))
 
     def test_11(self):
-        arr = [1,6,1,4,8]
+        arr = [1, 6, 1, 4, 8]
         self.assertEqual(2, solution(arr))
