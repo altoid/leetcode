@@ -18,7 +18,6 @@ def solution(mystr):
     p = 0
     for c in mystr:
         if c not in characters_seen:
-            characters_seen[c] = p
             current_run += 1
         else:
             # this is a character we've seen before.
@@ -32,7 +31,7 @@ def solution(mystr):
             else:
                 current_run += 1
 
-            characters_seen[c] = p
+        characters_seen[c] = p
 
         p += 1
 
