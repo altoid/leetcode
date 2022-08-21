@@ -103,11 +103,14 @@ def solution(arr):
         arr[j] = min(arr[j], mr)
         j += 1
 
-    pprint(arr)
+    # pprint(arr)
 
     # pretend everything is 1-based
     for i in range(1, n + 1):
         j = i
+        if arr[j - 1] == 0:
+            continue
+
         v = arr[j - 1]
 
         while v != 0:
@@ -117,16 +120,18 @@ def solution(arr):
             j = v
             v = arr[j - 1]
 
-        pprint(arr)
+        # pprint(arr)
         pass
 
     # find the index of the first nonzero item in the array.  if the are all zero,
     # then the answer is n + 1
 
-    for i in range(n):
+    i = 0
+    while i < n:
         if arr[i] != 0:
-            return i + 1
-    return n + 1
+            break
+        i += 1
+    return i + 1
 
 
 class Solution:
@@ -143,8 +148,40 @@ class MyTest(unittest.TestCase):
 
     def test_1(self):
         arr = [-5, -3, -1, 1, 3, 5, 7, 9, 11]
-        solution(arr)
+        self.assertEqual(2, solution(arr))
 
     def test_2(self):
         arr = [1, 6, 7, 3, 3, 4, 2]
         self.assertEqual(5, solution(arr))
+
+    def test_3(self):
+        arr = [0]
+        self.assertEqual(1, solution(arr))
+
+    def test_4(self):
+        arr = [-3, -2, -1]
+        self.assertEqual(1, solution(arr))
+
+    def test_5(self):
+        arr = [2, 3, 4]
+        self.assertEqual(1, solution(arr))
+
+    def test_6(self):
+        arr = [1, 1, 1, 1, 1, 1, 1]
+        self.assertEqual(2, solution(arr))
+
+    def test_7(self):
+        arr = [1, 2, 3, 4, 5, 6, 7, 8]
+        self.assertEqual(9, solution(arr))
+
+    def test_8(self):
+        arr = [1, 2, 0]
+        self.assertEqual(3, solution(arr))
+
+    def test_9(self):
+        arr = [3, 4, -1, 1]
+        self.assertEqual(2, solution(arr))
+
+    def test_10(self):
+        arr = [7, 8, 9, 11, 12]
+        self.assertEqual(1, solution(arr))
