@@ -111,27 +111,23 @@ def solution(arr):
         if arr[j - 1] == 0:
             continue
 
-        v = arr[j - 1]
-
-        while v != 0:
-            if arr[v - 1] == 0:
-                break
-            arr[j - 1] = 0
-            j = v
-            v = arr[j - 1]
-
+        origin = j
+        terminus = arr[origin - 1]  # what position i maps to in the array
+        while arr[terminus - 1] != 0:
+            origin = terminus
+            terminus = arr[terminus - 1]
+            arr[origin - 1] = 0
         # pprint(arr)
-        pass
 
     # find the index of the first nonzero item in the array.  if the are all zero,
     # then the answer is n + 1
 
-    i = 0
-    while i < n:
-        if arr[i] != 0:
+    k = 0
+    while k < n:
+        if arr[k] != 0:
             break
-        i += 1
-    return i + 1
+        k += 1
+    return k + 1
 
 
 class Solution:
@@ -185,3 +181,7 @@ class MyTest(unittest.TestCase):
     def test_10(self):
         arr = [7, 8, 9, 11, 12]
         self.assertEqual(1, solution(arr))
+
+    def test_11(self):
+        arr = [1,6,1,4,8]
+        self.assertEqual(2, solution(arr))
