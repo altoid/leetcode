@@ -97,26 +97,36 @@ def solution(arr):
         mr = max(mr, x)
 
     # we should really make a copy of the list but the constraints are to have O(1) storage.
-    i = 0
-    while i < n:
-        arr[i] = max(mp, arr[i])
-        arr[i] = min(arr[i], mr)
-        i += 1
+    j = 0
+    while j < n:
+        arr[j] = max(mp, arr[j])
+        arr[j] = min(arr[j], mr)
+        j += 1
 
     pprint(arr)
 
     # pretend everything is 1-based
-    i = 4  # actually position 3
-    j = i - 1
-    print("i = %s, j = %s" % (i, j))
-    while arr[j] != 0:
-        i = arr[j]
-        arr[j] = 0
-        j = i - 1
-        print("i = %s, j = %s" % (i, j))
+    for i in range(1, n + 1):
+        j = i
+        v = arr[j - 1]
 
-    pprint(arr)
+        while v != 0:
+            if arr[v - 1] == 0:
+                break
+            arr[j - 1] = 0
+            j = v
+            v = arr[j - 1]
 
+        pprint(arr)
+        pass
+
+    # find the index of the first nonzero item in the array.  if the are all zero,
+    # then the answer is n + 1
+
+    for i in range(n):
+        if arr[i] != 0:
+            return i + 1
+    return n + 1
 
 
 class Solution:
@@ -137,4 +147,4 @@ class MyTest(unittest.TestCase):
 
     def test_2(self):
         arr = [1, 6, 7, 3, 3, 4, 2]
-        solution(arr)
+        self.assertEqual(5, solution(arr))
