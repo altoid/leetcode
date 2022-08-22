@@ -92,7 +92,7 @@ def solution(arr):
 
     if mp > 1:
         return 1
-    
+
     # find the largest positive value <= the size of the array.
     mr = mp
     for x in arr:
@@ -153,7 +153,7 @@ class MyTest(unittest.TestCase):
         self.s = Solution()
 
     def test_12(self):
-        arr = [-1,-2,-60,40,43]
+        arr = [-1, -2, -60, 40, 43]
         self.assertEqual(1, solution(arr))
 
     def test_1(self):
