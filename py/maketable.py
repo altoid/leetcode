@@ -21,6 +21,7 @@
 import argparse
 import fileinput
 from pprint import pprint
+import sys
 
 
 if __name__ == '__main__':
@@ -57,8 +58,9 @@ if __name__ == '__main__':
         if line.startswith('+-'):
             break
 
-        data = line.split()
-        data = list(filter(lambda x: x != '|', data))
+        data = line.split('|')
+        data = list(filter(bool, data)) # remove empty strings caused by the split on '|'
+        data = [x.strip() for x in data]
         rows.append(data)
         line = fi.readline().strip()
 
