@@ -4,20 +4,23 @@ import unittest
 import llutils
 from pprint import pprint
 
+# idea - keep 4 pointers:  one for each of the nodes we're swapping and one each for the nodes
+# immediately before and after the pair.
 
-def solution(ll):
-    if ll is None:
-        return ll
 
-    if ll.next is None:
-        return ll
+def solution(head):
+    if head is None:
+        return head
+
+    if head.next is None:
+        return head
 
     # list has at least 2 items
 
     p0 = None
-    p1 = ll
-    p2 = ll.next
-    head = p2
+    p1 = head
+    p2 = head.next
+    newhead = p2
     p3 = p2.next
 
     while p2:
@@ -35,7 +38,7 @@ def solution(ll):
         if p2:
             p3 = p2.next
 
-    return head
+    return newhead
 
 
 class MyTest(unittest.TestCase):
