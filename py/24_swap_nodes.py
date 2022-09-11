@@ -80,3 +80,10 @@ class MyTest(unittest.TestCase):
         ll = llutils.to_linked_list(l)
         result = solution(ll)
         self.assertEqual(expected, llutils.ll_to_list(result))
+
+    def test7(self):
+        l = [6, 2, 5]
+        expected = [2, 6, 5]
+        ll = llutils.to_linked_list(l)
+        result = solution(ll)
+        self.assertEqual(expected, llutils.ll_to_list(result))
