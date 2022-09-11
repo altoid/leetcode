@@ -29,9 +29,20 @@ def ll_to_list(ll):
     return real
 
 
+def head(ll):
+    return ll
+
+
+def tail(ll):
+    p = ll
+    while p.next:
+        p = p.next
+    return p
+
+
 def reverse(ll):
     """
-    reverse the linked list; this modifies the list by changing all the pointers.
+    reverse the linked list in-place; this modifies the list by changing all the pointers.
     """
 
     p0 = None
