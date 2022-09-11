@@ -2,31 +2,7 @@
 
 import unittest
 from pprint import pprint
-
-
-# their definition for singly-linked list.
-class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
-
-
-def to_linked_list(l):
-    prev = None
-    for x in reversed(l):
-        n = ListNode(x, prev)
-        prev = n
-    return prev
-
-
-def ll_to_list(ll):
-    real = []
-    n = ll
-    while n:
-        real.append(n.val)
-        n = n.next
-
-    return real
+from llutils import ListNode, to_linked_list, ll_to_list
 
 
 def solution(l1, l2):

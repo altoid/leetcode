@@ -2,4 +2,4 @@
 *~
 .*~
 *.py[cod]
-venv/
+venv*/
