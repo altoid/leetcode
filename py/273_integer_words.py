@@ -111,6 +111,15 @@ def three_digit_phrase(n):
     return phrase
 
 
+def split_number(n_str):
+    splits = []
+    for i in range(-1, -len(n_str) - 1, -3):
+        splits.append(n_str[i:i - 3:-1])
+    splits = splits[::-1]
+    splits = [x[::-1] for x in splits]
+    return splits
+
+
 # 2,147,483,647
 def solution(n: int):
     if n == 0:
@@ -118,13 +127,8 @@ def solution(n: int):
 
     magnitudes = ['Billion', 'Million', 'Thousand', '']
     n_str = str(n)
-    ncommas = (len(n_str) - 1) // 3
-    n_str_rev = n_str[::-1]
-    splits = []
-    for i in range(-1, -len(n_str) - 1, -3):
-        splits.append(n_str[i:i - 3:-1])
-    splits = splits[::-1]
-    splits = [x[::-1] for x in splits]
+    splits = split_number(n_str)
+    # print(splits)
 
     phrase = []
     m = len(magnitudes) - len(splits)
@@ -151,15 +155,14 @@ if __name__ == '__main__':
     #     phrase = ' '.join(three_digit_phrase(s))
     #     print("%s: %s" % (s, phrase))
 
-    # while True:
-    #     n = random.randint(1, 999)
-    #     s = str(n)
-    #     #print("trying %s" % s)
-    #     phrase = ' '.join(three_digit_phrase(s))
-    #     print("%s: %s" % (s, phrase))
-
     print(solution(2147483647))
-    pass
+
+    while True:
+        n = random.randint(0, 2 ** 31 - 1)
+        s = str(n)
+        splits = split_number(s)
+        print("trying %s" % s)
+        print("%s: %s" % (','.join(splits), solution(s)))
 
 
 class MyTest(unittest.TestCase):
@@ -183,3 +186,7 @@ class MyTest(unittest.TestCase):
 
     def test_3(self):
         self.assertEqual("Two Billion One Hundred Forty Seven Million Four Hundred Eighty Three Thousand Six Hundred Forty Seven", solution(2 ** 31 - 1))
+
+    def test_4(self):
+        self.assertEqual("One Hundred Two Million Thirty Thousand Four Hundred Five", solution(102030405))
+        self.assertEqual("One Billion Three", solution(1000000003))
