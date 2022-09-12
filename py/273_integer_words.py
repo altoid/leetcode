@@ -111,9 +111,33 @@ def three_digit_phrase(n):
     return phrase
 
 
-def solution(n):
-    if n == '0':
+# 2,147,483,647
+def solution(n: int):
+    if n == 0:
         return 'Zero'
+
+    magnitudes = ['Billion', 'Million', 'Thousand', '']
+    n_str = str(n)
+    ncommas = (len(n_str) - 1) // 3
+    n_str_rev = n_str[::-1]
+    splits = []
+    for i in range(-1, -len(n_str) - 1, -3):
+        splits.append(n_str[i:i - 3:-1])
+    splits = splits[::-1]
+    splits = [x[::-1] for x in splits]
+
+    phrase = []
+    m = len(magnitudes) - len(splits)
+    for s in splits:
+        snippet = three_digit_phrase(s)
+        if snippet:
+            snippet += [magnitudes[m]]
+            # print("%s %s" % (snippet, magnitudes[m]))
+            phrase += snippet
+
+        m += 1
+
+    return ' '.join(phrase).strip()
 
 
 if __name__ == '__main__':
@@ -127,18 +151,35 @@ if __name__ == '__main__':
     #     phrase = ' '.join(three_digit_phrase(s))
     #     print("%s: %s" % (s, phrase))
 
-    while True:
-        n = random.randint(1, 999)
-        s = str(n)
-        #print("trying %s" % s)
-        phrase = ' '.join(three_digit_phrase(s))
-        print("%s: %s" % (s, phrase))
+    # while True:
+    #     n = random.randint(1, 999)
+    #     s = str(n)
+    #     #print("trying %s" % s)
+    #     phrase = ' '.join(three_digit_phrase(s))
+    #     print("%s: %s" % (s, phrase))
+
+    print(solution(2147483647))
+    pass
 
 
 class MyTest(unittest.TestCase):
-    def test_1(self):
-        for i in range(100, 200):
-            s = str(i)
-            phrase = ' '.join(three_digit_phrase(s))
-            print("%s: %s" % (s, phrase))
+    def test_powers_of_10(self):
+        self.assertEqual("Zero", solution(0))
+        self.assertEqual("One", solution(1))
+        self.assertEqual("Ten", solution(10))
+        self.assertEqual("One Hundred", solution(100))
+        self.assertEqual("One Thousand", solution(1000))
+        self.assertEqual("Ten Thousand", solution(10000))
+        self.assertEqual("One Hundred Thousand", solution(100000))
+        self.assertEqual("One Million", solution(1000000))
+        self.assertEqual("Ten Million", solution(10000000))
+        self.assertEqual("One Hundred Million", solution(100000000))
+        self.assertEqual("One Billion", solution(1000000000))
 
+    def test_2(self):
+        self.assertEqual("One Hundred One", solution(101))
+        self.assertEqual("One Million Ten", solution(1000010))
+        self.assertEqual("One Million One Hundred One", solution(1000101))
+
+    def test_3(self):
+        self.assertEqual("Two Billion One Hundred Forty Seven Million Four Hundred Eighty Three Thousand Six Hundred Forty Seven", solution(2 ** 31 - 1))
