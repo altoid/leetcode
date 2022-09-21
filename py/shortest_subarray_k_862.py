@@ -205,3 +205,15 @@ class MyTest(unittest.TestCase):
         k = 6
         expected = -1
         self.assertEqual(expected, solution(arr, k))
+
+    def test5(self):
+        arr = [1, 2]
+        k = 4
+        expected = -1
+        self.assertEqual(expected, solution(arr, k))
+
+    def test6(self):
+        arr = [2,-1,2]
+        k = 3
+        expected = 3
+        self.assertEqual(expected, solution(arr, k))
