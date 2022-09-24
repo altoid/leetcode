@@ -11,7 +11,7 @@ from collections import deque
 def solution_bruteforce(arr, k):
     result = []
     for i in range(len(arr) - k + 1):
-        result.append(max(arr[i:i+k]))
+        result.append(max(arr[i:i + k]))
     return result
 
 
@@ -45,6 +45,7 @@ def solution_deque(arr, k):
         result.append(d[-1][1])
 
     return result
+
 
 if __name__ == '__main__':
     # arr = [1, 3, -1, -3, 2, 3, 6, 7]
@@ -81,3 +82,11 @@ class MyTest(unittest.TestCase):
         k = 5
         expecting = [10, 9, 9, 8]
         self.assertEqual(expecting, solution_deque(arr, k))
+
+    def test_3(self):
+        arr = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        k = 4
+        expecting = [10, 9, 8, 7, 6, 5, 4]
+        self.assertEqual(expecting, solution_deque(arr, k))
+
+# chokes on: [10000 .. -10000], 10007
