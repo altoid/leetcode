@@ -42,12 +42,7 @@ def solution_deque(arr, k):
     result.append(d[-1][1])
 
     for i in range(k, len(arr_enumerated)):
-        # try:
-        #     d.remove((i - k, arr_enumerated[i - k][1]))
-        # except ValueError:
-        #     pass
-
-        if arr[i - k] == d[-1][1]:
+        if arr_enumerated[i - k] == d[-1]:
             d.pop()
 
         while d[-1][0] < i - k:
@@ -64,7 +59,7 @@ if __name__ == '__main__':
 
     i = 1
     while True:
-        arr = [random.randint(-10000, 10000) for _ in range(1, 22)]
+        arr = [random.randint(-10000, 10000) for _ in range(1, 222)]
         k = random.randint(1, len(arr) - 1)
         try:
             deque_result = solution_deque(arr, k)
