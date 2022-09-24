@@ -61,16 +61,7 @@ if __name__ == '__main__':
     while True:
         arr = [random.randint(-10000, 10000) for _ in range(1, 222)]
         k = random.randint(1, len(arr) - 1)
-        try:
-            deque_result = solution_deque(arr, k)
-        except:
-            print("arr = %s" % arr)
-            print("k = %s" % k)
-            print("expecting = %s" % bf_result)
-            print("test = %s" % deque_result)
-            if i % 1000 == 0:
-                print("ran %s tests" % i)
-            break
+        deque_result = solution_deque(arr, k)
 
         bf_result = solution_bruteforce(arr, k)
 
