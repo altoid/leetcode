@@ -4,9 +4,10 @@
 
 import unittest
 from pprint import pprint
+import random
 
 
-class Solution:
+def solution():
     pass
 
 
@@ -15,8 +16,5 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.s = Solution()
-
     def test_1(self):
         pass
