@@ -11,10 +11,11 @@ def census_complete(window_census, t_chars_to_match):
     """
     return true iff every character (including dups) in t_chars_to_match is also in the window_census
     """
-    for tk, tv in t_chars_to_match.items():
-        # if tk not in window_census:
-        #     return False
 
+    # this check can be considered an O(1) operation, because checking each letter takes constant time
+    # and the max number of unique letters is a constant.
+
+    for tk, tv in t_chars_to_match.items():
         if window_census[tk] < tv:
             return False
 
