@@ -14,7 +14,7 @@ import random
 import re
 
 
-def visit(text, positions_to_words, word_counts, all_indices, fromhere, nwords):
+def visit(positions_to_words, word_counts, all_indices, fromhere, nwords):
     """
     fromhere is an index into all_indices
     """
@@ -68,9 +68,11 @@ def solution(text, words):
     all_indices = []
     positions_to_words = {}
 
-    matches = re.finditer("|".join(unique_words), text)
+    pattern = "|".join(unique_words)
+    pattern = "(?=(%s))" % pattern
+    matches = re.finditer(pattern, text)
     for m in matches:
-        span = m.span()
+        span = m.start(1), m.end(1)
         substring = text[span[0]:span[1]]
         positions_to_words[span[0]] = substring
         all_indices.append(span[0])
@@ -78,23 +80,47 @@ def solution(text, words):
     # maybe we don't need to do this
     sorted(all_indices)
 
-    # TODO - all_indices might be empty
-
     result = []
     for i in range(len(all_indices) - len(words) + 1):
-        r = visit(text, positions_to_words, word_counts, all_indices, i, len(words))
+        r = visit(positions_to_words, word_counts, all_indices, i, len(words))
         if r is not None:
             result.append(r)
 
     return result
 
 
-if __name__ == '__main__':
-    s = "barfoofoobarthefoobarman"
-    words = ["bar", "foo", "the"]
+def futz(s, pattern):
+    # if the pattern is a lookahead pattern, spans will be 0-width, i guess because they match 0 chars.
+    # if NOT a lookahead pattern, spans are nonzero width.
+    matches = re.finditer(pattern, s)
+    for m in matches:
+        print(m.groups())
+        print(m.groups()[0])
+        print(m.start(1), m.end(1))
+        #print(m.span())
+        print(m)
 
-    result = solution(s, words)
-    pprint(result)
+    # matches = re.findall(pattern, s)
+    # pprint(matches)
+
+
+if __name__ == '__main__':
+    s = "aaaaaaaaaaaaaa"
+    pattern = r'(?=(aa))'
+
+    #futz("aaaaaaaaaaaaaa", r'(?=(aa))')
+    futz("aaaaabbbbb", r'(?=(aa|bb))')
+    #futz("aaaaabbbbb", r'(aa|bb)')
+
+    # result = solution(s, words)
+    # pprint(result)
+
+    # s = '1' * 15
+    # result = re.findall(r'(?=(11111))', s)
+    #
+    # pprint(result)
+    # for i in result:
+    #     print(i.start(1), i.end(1))
 
 
 class MyTest(unittest.TestCase):
@@ -140,3 +166,9 @@ class MyTest(unittest.TestCase):
         result = solution(s, words)
         self.assertEqual(expecting, result)
 
+    def test_7(self):
+        s = "aaaaaaaaaaaaaa"  # len == 14
+        words = ["aa", "aa"]
+        expecting = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+        result = set(solution(s, words))
+        self.assertEqual(expecting, result)
