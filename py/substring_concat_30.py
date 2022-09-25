@@ -86,8 +86,7 @@ def solution(text, words):
         if r is not None:
             result.append(r)
 
-    if result:
-        return result
+    return result
 
 
 if __name__ == '__main__':
@@ -110,5 +109,34 @@ class MyTest(unittest.TestCase):
         s = "barfoofoobarthefoobarman"
         words = ["mairzy", "doates", "pickle"]
         result = solution(s, words)
-        self.assertIsNone(result)
+        expecting = []
+        self.assertEqual(expecting, result)
+
+    def test_3(self):
+        s = "barfoofooxbarxthefoobarman"
+        words = ["bar", "foo", "the"]
+        expecting = {14}
+        result = set(solution(s, words))
+        self.assertEqual(expecting, result)
+
+    def test_4(self):
+        s = "barfoofoobarthefoobarman"
+        words = ["bar", "foo", "the", "foo"]
+        expecting = {3, 6}
+        result = set(solution(s, words))
+        self.assertEqual(expecting, result)
+
+    def test_5(self):
+        s = "barfoothefoobarman"
+        words = ["bar", "foo"]
+        expecting = {9, 0}
+        result = set(solution(s, words))
+        self.assertEqual(expecting, result)
+
+    def test_6(self):
+        s = "wordgoodgoodgoodbestword"
+        words = ["word", "good", "best", "word"]
+        expecting = []
+        result = solution(s, words)
+        self.assertEqual(expecting, result)
 
