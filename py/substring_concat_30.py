@@ -22,6 +22,7 @@ class Solution(object):
         self.word_counts = None
         self.positions_to_words = None
         self.all_indices = None
+        self.hopeless = False
 
     def initialize(self, text, words):
         self.text = text
