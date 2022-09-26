@@ -17,47 +17,52 @@ import re
 class Solution:
     def __init__(self):
         self.text = None
-        self.words = None
+        self.unique_words = None
         self.total_word_length = None
         self.word_counts = None
-        self.positions_to_words = None
+
+        # maps index of a word in the text to index into unique_words list.  memory optimization
+        self.position_to_unique_word_idx = None
         self.all_indices = None
         self.hopeless = False
 
     def initialize(self, text, words):
         self.text = text
-        self.words = words
         self.total_word_length = sum([len(x) for x in words])
         self.hopeless = False
 
         # count the number of times each word is to appear in a correct substring
         self.word_counts = {}
-        for w in self.words:
+        for w in words:
             if w not in self.word_counts:
                 self.word_counts[w] = 0
             self.word_counts[w] += 1
 
+        # create a list of unique words; shake out dups.
+        self.unique_words = list(set(words))
+        unique_word_indexes = {}
+        for i in range(len(self.unique_words)):
+            unique_word_indexes[self.unique_words[i]] = i
+
         # optimization - if some word doesn't appear at all in the text, there's no way any permutation can exist.
         words_in_text = {}
-        for w in self.words:
+        for w in self.unique_words:
             if w not in words_in_text:
                 words_in_text[w] = 0
 
         # get the index of each word as it appears in the text.  create a list of all indexes,
         # an a mapping of indexes to words.
 
-        # create a list of unique words; shake out dups.
-        unique_words = list(set(self.words))
         self.all_indices = []
-        self.positions_to_words = {}
+        self.position_to_unique_word_idx = {}
 
-        pattern = "|".join(unique_words)
+        pattern = "|".join(self.unique_words)
         pattern = "(?=(%s))" % pattern
         matches = re.finditer(pattern, self.text)
         for m in matches:
             span = m.start(1), m.end(1)
             substring = text[span[0]:span[1]]
-            self.positions_to_words[span[0]] = substring
+            self.position_to_unique_word_idx[span[0]] = unique_word_indexes[substring]
             self.all_indices.append(span[0])
             words_in_text[substring] += 1
 
@@ -70,7 +75,7 @@ class Solution:
     def found_complete_permutation(self, ledger):
         # if we placed all the words, we can stop.
         done = True
-        for w in self.words:
+        for w in self.unique_words:
             if ledger[w] < self.word_counts[w]:
                 done = False
                 break
@@ -99,7 +104,8 @@ class Solution:
             ledger[w] = 0
 
         # we know there is a word it text[all_indices[fromhere]], and we know what it is.
-        word = self.positions_to_words[self.all_indices[fromhere]]
+        ref = self.position_to_unique_word_idx[self.all_indices[fromhere]]
+        word = self.unique_words[ref]
         ledger[word] += 1
 
         idx_after_word = self.all_indices[fromhere] + len(word)
@@ -118,7 +124,8 @@ class Solution:
             # are we here?  then self.all_indices[fromhere + i] == idx_after_word
             # so the next word is adjacent to this one
 
-            word = self.positions_to_words[self.all_indices[fromhere + i]]
+            ref = self.position_to_unique_word_idx[self.all_indices[fromhere + i]]
+            word = self.unique_words[ref]
             ledger[word] += 1
             if ledger[word] > self.word_counts[word]:
                 return None
