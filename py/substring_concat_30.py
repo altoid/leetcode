@@ -15,7 +15,15 @@ import re
 
 
 class Solution(object):
-    def __init__(self, text, words):
+    def __init__(self):
+        self.text = None
+        self.words = None
+        self.total_word_length = None
+        self.word_counts = None
+        self.positions_to_words = None
+        self.all_indices = None
+
+    def initialize(self, text, words):
         self.text = text
         self.words = words
         self.total_word_length = sum([len(x) for x in words])
@@ -41,7 +49,6 @@ class Solution(object):
         unique_words = list(set(self.words))
         self.all_indices = []
         self.positions_to_words = {}
-
 
         pattern = "|".join(unique_words)
         pattern = "(?=(%s))" % pattern
@@ -136,6 +143,10 @@ class Solution(object):
 
         return result
 
+    def findSubstring(self, s, words):
+        self.initialize(s, words)
+        return self.solve()
+
 
 def futz(s, pattern):
     # if the pattern is a lookahead pattern, spans will be 0-width, i guess because they match 0 chars.
@@ -175,63 +186,71 @@ class MyTest(unittest.TestCase):
     def test_1(self):
         s = "barfoofoobarthefoobarman"
         words = ["bar", "foo", "the"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = {6, 9, 12}
-        result = set(solution.solve())
+        result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
 
     def test_2(self):
         s = "barfoofoobarthefoobarman"
         words = ["mairzy", "doates", "pickle"]
-        solution = Solution(s, words)
-        result = solution.solve()
+        solution = Solution()
+        result = solution.findSubstring(s, words)
         expecting = []
         self.assertEqual(expecting, result)
 
     def test_3(self):
         s = "barfoofooxbarxthefoobarman"
         words = ["bar", "foo", "the"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = {14}
-        result = set(solution.solve())
+        result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
 
     def test_4(self):
         s = "barfoofoobarthefoobarman"
         words = ["bar", "foo", "the", "foo"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = {3, 6}
-        result = set(solution.solve())
+        result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
 
     def test_5(self):
         s = "barfoothefoobarman"
         words = ["bar", "foo"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = {9, 0}
-        result = set(solution.solve())
+        result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
 
     def test_6(self):
         s = "wordgoodgoodgoodbestword"
         words = ["word", "good", "best", "word"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = []
-        result = solution.solve()
+        result = solution.findSubstring(s, words)
         self.assertEqual(expecting, result)
 
     def test_7(self):
         s = "aaaaaaaaaaaaaa"  # len == 14
         words = ["aa", "aa"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-        result = set(solution.solve())
+        result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
 
     def test_8(self):
         s = "aaaaa"
         words = ["aaaaaaaaa"]
-        solution = Solution(s, words)
+        solution = Solution()
         expecting = []
-        result = solution.solve()
+        result = solution.findSubstring(s, words)
+        self.assertEqual(expecting, result)
+
+    def test_9(self):
+        s = "aaaaaaaaaaaaaa"  # len == 14
+        words = ["aaaaaaaaaaaaa"]
+        solution = Solution()
+        expecting = {0, 1}
+        result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
