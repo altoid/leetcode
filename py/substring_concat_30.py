@@ -67,9 +67,6 @@ class Solution:
                 self.hopeless = True
                 break
 
-        # maybe we don't need to do this
-        sorted(self.all_indices)
-
     def found_complete_permutation(self, ledger):
         # if we placed all the words, we can stop.
         done = True
