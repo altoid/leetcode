@@ -19,6 +19,7 @@ class Solution(object):
         self.text = text
         self.words = words
         self.total_word_length = sum([len(x) for x in words])
+        self.hopeless = False
 
         # count the number of times each word is to appear in a correct substring
         self.word_counts = {}
@@ -26,6 +27,12 @@ class Solution(object):
             if w not in self.word_counts:
                 self.word_counts[w] = 0
             self.word_counts[w] += 1
+
+        # optimization - if some word doesn't appear at all in the text, there's no way any permutation can exist.
+        words_in_text = {}
+        for w in self.words:
+            if w not in words_in_text:
+                words_in_text[w] = 0
 
         # get the index of each word as it appears in the text.  create a list of all indexes,
         # an a mapping of indexes to words.
@@ -35,6 +42,7 @@ class Solution(object):
         self.all_indices = []
         self.positions_to_words = {}
 
+
         pattern = "|".join(unique_words)
         pattern = "(?=(%s))" % pattern
         matches = re.finditer(pattern, self.text)
@@ -43,6 +51,13 @@ class Solution(object):
             substring = text[span[0]:span[1]]
             self.positions_to_words[span[0]] = substring
             self.all_indices.append(span[0])
+            words_in_text[substring] += 1
+
+        # if some word doesn't appear in the text, there is no solution
+        for v in words_in_text.values():
+            if v == 0:
+                self.hopeless = True
+                break
 
         # maybe we don't need to do this
         sorted(self.all_indices)
@@ -55,49 +70,69 @@ class Solution(object):
     #
     # because of this, adjacent indices may be closer together than the length of any word.
     #
-    def visit(self, fromhere, nwords):
+    def visit(self, fromhere):
         """
-        fromhere is an index into all_indices
+        fromhere is an index into all_indices.
+
+        what we know:
+        - it is possible for a permutation to fit starting at text[all_indices[fromhere]]
+        - some permutation exists in the text
         """
 
         ledger = {}
         for w in self.word_counts.keys():
             ledger[w] = 0
 
-        if len(self.all_indices) - fromhere < nwords:
-            return None
+        # we know there is a word it text[all_indices[fromhere]], and we know what it is.
+        word = self.positions_to_words[self.all_indices[fromhere]]
+        ledger[word] += 1
 
-        i = 0
-        while i < nwords - 1:
-            # the word at fromhere + i is not adjacent to the word at fromhere + i + 1
-            w = self.positions_to_words[self.all_indices[fromhere + i]]
-            if self.all_indices[fromhere + i + 1] - self.all_indices[fromhere + i] != len(w):
-                # TODO find an optimization where we don't have to keep calling len()
+        idx_after_word = self.all_indices[fromhere] + len(word)
+
+        for i in range(len(self.all_indices) - fromhere):
+            if self.all_indices[fromhere + i] < idx_after_word:
+                continue
+
+            if self.all_indices[fromhere + i] > idx_after_word:
                 return None
 
-            ledger[w] += 1
-            if ledger[w] > self.word_counts[w]:
+            # are we here?  then self.all_indices[fromhere + i] == idx_after_word
+            # so the next word is adjacent to this one
+
+            word = self.positions_to_words[self.all_indices[fromhere + i]]
+            ledger[word] += 1
+            if ledger[word] > self.word_counts[word]:
                 return None
 
-            i += 1
+            # if we placed all the words, we can stop.
+            done = True
+            for w in self.words:
+                if ledger[w] < self.word_counts[w]:
+                    done = False
+                    break
 
-        w = self.positions_to_words[self.all_indices[fromhere + i]]
-        ledger[w] += 1
-        if ledger[w] > self.word_counts[w]:
-            return None
+            if done:
+                break
 
-        for k in self.word_counts.keys():
-            if self.word_counts[k] != ledger[k]:
+            idx_after_word = self.all_indices[fromhere + i] + len(word)
+
+        for w in self.words:
+            if ledger[w] < self.word_counts[w]:
                 return None
 
         return self.all_indices[fromhere]
 
     def solve(self):
         result = []
-        for i in range(len(self.all_indices) - len(self.words) + 1):
-            r = self.visit(i, len(self.words))
-            if r is not None:
-                result.append(r)
+        if self.hopeless:
+            return result
+
+        for i in range(len(self.all_indices)):
+            if len(self.text) - self.all_indices[i] >= self.total_word_length:
+                # visit at each index that leaves enough room to fit a permutation
+                r = self.visit(i)
+                if r is not None:
+                    result.append(r)
 
         return result
 
@@ -185,11 +220,18 @@ class MyTest(unittest.TestCase):
         result = solution.solve()
         self.assertEqual(expecting, result)
 
-    @unittest.skip
     def test_7(self):
         s = "aaaaaaaaaaaaaa"  # len == 14
         words = ["aa", "aa"]
         solution = Solution(s, words)
         expecting = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
         result = set(solution.solve())
+        self.assertEqual(expecting, result)
+
+    def test_8(self):
+        s = "aaaaa"
+        words = ["aaaaaaaaa"]
+        solution = Solution(s, words)
+        expecting = []
+        result = solution.solve()
         self.assertEqual(expecting, result)
