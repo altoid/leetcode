@@ -14,7 +14,7 @@ import random
 import re
 
 
-class Solution(object):
+class Solution:
     def __init__(self):
         self.text = None
         self.words = None
@@ -70,6 +70,16 @@ class Solution(object):
         # maybe we don't need to do this
         sorted(self.all_indices)
 
+    def found_complete_permutation(self, ledger):
+        # if we placed all the words, we can stop.
+        done = True
+        for w in self.words:
+            if ledger[w] < self.word_counts[w]:
+                done = False
+                break
+
+        return done
+
     #
     # we have to do a lot of work to handle this case:
     #
@@ -98,6 +108,10 @@ class Solution(object):
         idx_after_word = self.all_indices[fromhere] + len(word)
 
         for i in range(len(self.all_indices) - fromhere):
+            # if we placed all the words, we can stop.
+            if self.found_complete_permutation(ledger):
+                break
+
             if self.all_indices[fromhere + i] < idx_after_word:
                 continue
 
@@ -112,23 +126,10 @@ class Solution(object):
             if ledger[word] > self.word_counts[word]:
                 return None
 
-            # if we placed all the words, we can stop.
-            done = True
-            for w in self.words:
-                if ledger[w] < self.word_counts[w]:
-                    done = False
-                    break
-
-            if done:
-                break
-
             idx_after_word = self.all_indices[fromhere + i] + len(word)
 
-        for w in self.words:
-            if ledger[w] < self.word_counts[w]:
-                return None
-
-        return self.all_indices[fromhere]
+        if self.found_complete_permutation(ledger):
+            return self.all_indices[fromhere]
 
     def solve(self):
         result = []
@@ -253,5 +254,13 @@ class MyTest(unittest.TestCase):
         words = ["aaaaaaaaaaaaa"]
         solution = Solution()
         expecting = {0, 1}
+        result = set(solution.findSubstring(s, words))
+        self.assertEqual(expecting, result)
+
+    def test_10(self):
+        s = "mississippi"
+        words = ["is"]
+        solution = Solution()
+        expecting = {1, 4}
         result = set(solution.findSubstring(s, words))
         self.assertEqual(expecting, result)
