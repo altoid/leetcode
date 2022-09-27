@@ -8,6 +8,17 @@ import random
 import re
 
 
+# this is what i submitted
+class Solution:
+    def __init__(self):
+        pattern = r'^[-+]{0,1}(\d+(\.\d*)?|\.[\d]+)([eE][+-]?\d+)?$'
+        self.compiled_re = re.compile(pattern)
+
+    def isNumber(self, s: str) -> bool:
+        result = self.compiled_re.match(s)
+        return bool(result)
+
+
 def solution(n):
     pattern = r'^[-+]{0,1}(\d+(\.\d*)?|\.[\d]+)([eE][+-]?\d+)?$'
     result = re.match(pattern, n)
