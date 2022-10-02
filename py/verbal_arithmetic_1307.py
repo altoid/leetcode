@@ -16,7 +16,7 @@ def solution_1(addends, result):
     unique_letters = ''.join(sorted(list(set(mashup))))
 
     # find the first letters of all of the addends and result
-    first_letters = list(set([x[0] for x in addends + [result]]))
+    first_letters = set([x[0] for x in addends + [result]])
     pprint(first_letters)
     first_letter_index = {}
     for l in first_letters:
@@ -27,7 +27,7 @@ def solution_1(addends, result):
     for p in permutations(digits, len(unique_letters)):
         # map each permutation to the digits.
         usable = True
-        for k, v in first_letter_index.items():
+        for v in first_letter_index.values():
             if p[v] == '0':
                 usable = False
                 break
@@ -68,12 +68,14 @@ def solution_2(addends, result):
 
     all_digits = {str(x) for x in range(10)}
     nonzero_digits = {str(x) for x in range(1, 10)}
+    nunused = len(unique_letters) - len(first_letters)
 
     for nzp in permutations(nonzero_digits, len(first_letters)):
         nz_used = set(nzp)
         unused = all_digits - nz_used
-        for zp in permutations(unused, len(unique_letters) - len(first_letters)):
-            digits_to_map = ''.join(nzp) + ''.join(zp)
+        nzp_string = ''.join(nzp)
+        for zp in permutations(unused, nunused):
+            digits_to_map = nzp_string + ''.join(zp)
 
             ttable = str.maketrans(letters_string, digits_to_map)
             sum_int = int(result.translate(ttable))
@@ -90,7 +92,7 @@ def solution_2(addends, result):
 
 
 def solution(addends, result):
-    return solution_2(addends, result)
+    return solution_1(addends, result)
 
 if __name__ == '__main__':
     pass
