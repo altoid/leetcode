@@ -305,8 +305,9 @@ class SolutionGraph(object):
                     self.letters_to_letter_states[col[1]].dependent = False
 
             if col[1] == col[2]:
+                # case 2
                 if self.letters_to_letter_states[col[1]].dependent is None:
-                    self.letters_to_letter_states[col[1]].dependent = True
+                    self.letters_to_letter_states[col[1]].dependent = False
             else:
                 if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[col[2]].dependent is None:
                     self.letters_to_letter_states[col[1]].dependent = False
@@ -344,13 +345,22 @@ if __name__ == '__main__':
     # result = "MONEY"
     # s = SolutionGraph(addends, result)
 
-    addends, result = make_crypto_sum(10, 99)
-    print(addends)
-    print(result)
+    for _ in range(1000):
+        addends, result = make_crypto_sum(100, 999)
+        print(addends)
+        print(result)
 
-    s = SolutionGraph(addends, result)
+        s = SolutionGraph(addends, result)
 
 class SGTest(unittest.TestCase):
+    def test_7(self):
+        addends = ["UPQ", "PPQ"]
+        result = "ECTQ"
+
+        print(addends)
+        print(result)
+        s = SolutionGraph(addends, result)
+
     def test_6(self):
         addends = ["OQ", "OY"]
         result = "QX"
