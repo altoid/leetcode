@@ -308,6 +308,7 @@ class SolutionGraph(object):
             elif len(col) == 2:
                 if self.letters_to_letter_states[col[1]].dependent is None:
                     self.letters_to_letter_states[col[1]].dependent = False
+                continue
 
             if col[1] == col[2]:
                 if col[0] == col[1]:
@@ -364,7 +365,7 @@ if __name__ == '__main__':
     # s = SolutionGraph(addends, result)
 
     for _ in range(10000):
-        addends, result = make_crypto_sum(1, 9)
+        addends, result = make_crypto_sum(1, 999999)
 
         s = SolutionGraph(addends, result)
 
