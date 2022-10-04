@@ -363,8 +363,8 @@ if __name__ == '__main__':
     # result = "MONEY"
     # s = SolutionGraph(addends, result)
 
-    for _ in range(1000):
-        addends, result = make_crypto_sum(100, 999)
+    for _ in range(10000):
+        addends, result = make_crypto_sum(1, 9)
 
         s = SolutionGraph(addends, result)
 
