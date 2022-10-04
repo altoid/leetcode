@@ -310,9 +310,8 @@ class SolutionGraph(object):
                 elif self.letters_to_letter_states[c1[2]].dependent is None:
                     self.letters_to_letter_states[c1[2]].dependent = True
 
-        self.sanity_check()
-
         pprint(self.letters_to_letter_states)
+        self.sanity_check()
 
     def sanity_check(self):
         # dependent is set for every letter, and at least one is independent
@@ -326,14 +325,10 @@ class SolutionGraph(object):
         if not found_indpendent:
             raise ValueError("no independent digits")
 
-        # all the digits in the sum are dependent
-        for c in self.result:
-            if not self.letters_to_letter_states[c].dependent:
-                raise ValueError("independent digit in sum:  %s" % c)
-
-        # at least one digit is independent
-
-        pass
+        # # all the digits in the sum are dependent
+        # for c in self.result:
+        #     if not self.letters_to_letter_states[c].dependent:
+        #         raise ValueError("independent digit in sum:  %s" % c)
 
 
 if __name__ == '__main__':
