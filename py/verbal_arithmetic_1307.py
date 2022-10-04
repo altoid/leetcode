@@ -179,6 +179,9 @@ class SolutionGraph(object):
         self.letters_to_letter_states = {}
         self.columns = []
 
+        print("addends = %s" % addends)
+        print("result = '%s'" % result)
+
         # reverse all of the addend and result strings so that the indexing arithmetic is easier
         addends_reversed = [x[::-1] for x in addends[::-1]]
         result_reversed = result[::-1]
@@ -215,7 +218,7 @@ class SolutionGraph(object):
             self.columns.append(column)
             i += 1
 
-        pprint(self.columns)
+        #pprint(self.columns)
 
         # deal with the special case where the sum is longer than either of the two addends.
         # we have to look at this first.
@@ -246,7 +249,7 @@ class SolutionGraph(object):
         #
         # 1. X = X + X   => X = 0
         # 2. Y = X + X   => X is independent
-        # 3. Y = X + Y   => X = 0
+        # 3. Y = X + Y   => X = 0, Y is independent
         # 4. Z = X + Y   => X and Y are independent
 
         if c0[1] == c0[2]:
@@ -260,16 +263,18 @@ class SolutionGraph(object):
                     # it's not already 1
                     self.letters_to_letter_states[c0[1]].dependent = False
         else:
-            if c0[1] == c0[0]:
+            if c0[0] == c0[1]:
                 # case 3
                 self.letters_to_letter_states[c0[2]].fixed = True
-                self.letters_to_letter_states[c0[2]].dependent = False
+                self.letters_to_letter_states[c0[2]].dependent = True
                 self.letters_to_letter_states[c0[2]].digit = 0
-            elif c0[2] == c0[0]:
+                self.letters_to_letter_states[c0[0]].dependent = False
+            elif c0[0] == c0[2]:
                 # also case 3
                 self.letters_to_letter_states[c0[1]].fixed = True
-                self.letters_to_letter_states[c0[1]].dependent = False
+                self.letters_to_letter_states[c0[1]].dependent = True
                 self.letters_to_letter_states[c0[1]].digit = 0
+                self.letters_to_letter_states[c0[0]].dependent = False
             else:
                 # case 4
                 if self.letters_to_letter_states[c0[0]].digit is None:
@@ -305,17 +310,28 @@ class SolutionGraph(object):
                     self.letters_to_letter_states[col[1]].dependent = False
 
             if col[1] == col[2]:
+                if col[0] == col[1]:
+                    # case 1
+                    pass
                 # case 2
                 if self.letters_to_letter_states[col[1]].dependent is None:
                     self.letters_to_letter_states[col[1]].dependent = False
             else:
-                if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[col[2]].dependent is None:
-                    self.letters_to_letter_states[col[1]].dependent = False
-                    self.letters_to_letter_states[col[2]].dependent = False
-                elif self.letters_to_letter_states[col[1]].dependent is None:
-                    self.letters_to_letter_states[col[1]].dependent = True
-                elif self.letters_to_letter_states[col[2]].dependent is None:
-                    self.letters_to_letter_states[col[2]].dependent = True
+                if col[0] == col[1]:
+                    # case 3
+                    self.letters_to_letter_states[c0[0]].dependent = False
+                elif col[0] == col[2]:
+                    # also case 3
+                    self.letters_to_letter_states[c0[0]].dependent = False
+                else:
+                    # case 4
+                    if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[col[2]].dependent is None:
+                        self.letters_to_letter_states[col[1]].dependent = False
+                        self.letters_to_letter_states[col[2]].dependent = False
+                    elif self.letters_to_letter_states[col[1]].dependent is None:
+                        self.letters_to_letter_states[col[1]].dependent = True
+                    elif self.letters_to_letter_states[col[2]].dependent is None:
+                        self.letters_to_letter_states[col[2]].dependent = True
 
         pprint(self.letters_to_letter_states)
         self.sanity_check()
@@ -347,34 +363,32 @@ if __name__ == '__main__':
 
     for _ in range(1000):
         addends, result = make_crypto_sum(100, 999)
-        print(addends)
-        print(result)
 
         s = SolutionGraph(addends, result)
 
 class SGTest(unittest.TestCase):
+    def test_8(self):
+        addends = ["BJJ", "YPJ"]
+        result = "BJPJ"
+
+        s = SolutionGraph(addends, result)
+
     def test_7(self):
         addends = ["UPQ", "PPQ"]
         result = "ECTQ"
 
-        print(addends)
-        print(result)
         s = SolutionGraph(addends, result)
 
     def test_6(self):
         addends = ["OQ", "OY"]
         result = "QX"
 
-        print(addends)
-        print(result)
         s = SolutionGraph(addends, result)
 
     def test_5(self):
         addends = ["HY", "CV"]
         result = "VRS"
 
-        print(addends)
-        print(result)
         s = SolutionGraph(addends, result)
 
         self.assertFalse(s.letters_to_letter_states['Y'].dependent)
@@ -428,12 +442,12 @@ class SGTest(unittest.TestCase):
         self.assertNotEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[2]])
 
         self.assertFalse(s.letters_to_letter_states[c0[0]].fixed)
-        self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
+        self.assertFalse(s.letters_to_letter_states[c0[0]].dependent)
         self.assertIsNone(s.letters_to_letter_states[c0[0]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[0]].can_be_zero)
 
         self.assertTrue(s.letters_to_letter_states[c0[2]].fixed)
-        self.assertFalse(s.letters_to_letter_states[c0[2]].dependent)
+        self.assertTrue(s.letters_to_letter_states[c0[2]].dependent)
         self.assertEqual(0, s.letters_to_letter_states[c0[2]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[2]].can_be_zero)
 
@@ -447,12 +461,12 @@ class SGTest(unittest.TestCase):
         self.assertNotEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[1]])
 
         self.assertFalse(s.letters_to_letter_states[c0[0]].fixed)
-        self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
+        self.assertFalse(s.letters_to_letter_states[c0[0]].dependent)
         self.assertIsNone(s.letters_to_letter_states[c0[0]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[0]].can_be_zero)
 
         self.assertTrue(s.letters_to_letter_states[c0[1]].fixed)
-        self.assertFalse(s.letters_to_letter_states[c0[1]].dependent)
+        self.assertTrue(s.letters_to_letter_states[c0[1]].dependent)
         self.assertEqual(0, s.letters_to_letter_states[c0[1]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[1]].can_be_zero)
 
