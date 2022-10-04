@@ -189,9 +189,6 @@ class SolutionGraph(object):
         # find the first letters of all of the addends and result
         first_letters = set([x[0] for x in addends + [result]])
 
-        pprint(unique_letters)
-        pprint(first_letters)
-
         for l in unique_letters:
             self.letters_to_letter_states[l] = LetterState()
         for l in first_letters:
@@ -218,8 +215,6 @@ class SolutionGraph(object):
             self.columns.append(column)
             i += 1
 
-        print(addends_reversed)
-        print(result_reversed)
         pprint(self.columns)
 
         # deal with the special case where the sum is longer than either of the two addends.
@@ -284,40 +279,61 @@ class SolutionGraph(object):
                         self.letters_to_letter_states[c0[2]].dependent = False
                     elif self.letters_to_letter_states[c0[1]].digit is None:
                         # Y is the 1
-                        self.letters_to_letter_states[c0[1]].dependent = True
+                        self.letters_to_letter_states[c0[1]].dependent = False
                     else:
                         # X is the 1
-                        self.letters_to_letter_states[c0[2]].dependent = True
+                        self.letters_to_letter_states[c0[2]].dependent = False
                 else:
                     # then the addend digits are not the same.  pick one to be dependent
                     self.letters_to_letter_states[c0[1]].dependent = False
                     self.letters_to_letter_states[c0[2]].dependent = True
 
+        # next column
+        if len(result_reversed) > 1:
+            c1 = self.columns[1]
+
+            if self.letters_to_letter_states[c1[0]].dependent is None:
+                # we haven't encountered this letter yet.  but if the first time we are seeing it is in the sum,
+                # it's definitely dependent
+                self.letters_to_letter_states[c1[0]].dependent = True
+
+            # now look at the addend digits
+            if c1[1] == c1[2]:
+                if self.letters_to_letter_states[c1[1]].dependent is None:
+                    self.letters_to_letter_states[c1[1]].dependent = True
+            else:
+                if self.letters_to_letter_states[c1[1]].dependent is None and self.letters_to_letter_states[c1[2]].dependent is None:
+                    self.letters_to_letter_states[c1[1]].dependent = False
+                    self.letters_to_letter_states[c1[2]].dependent = False
+                elif self.letters_to_letter_states[c1[1]].dependent is None:
+                    self.letters_to_letter_states[c1[1]].dependent = True
+                elif self.letters_to_letter_states[c1[2]].dependent is None:
+                    self.letters_to_letter_states[c1[2]].dependent = True
+
+        self.sanity_check()
+
         pprint(self.letters_to_letter_states)
 
-        # # next column
-        # c1 = self.columns[1]
-        #
-        # if self.letters_to_letter_states[c1[0]].dependent is None:
-        #     # we haven't encountered this letter yet.  but if the first time we are seeing it is in the sum,
-        #     # it's definitely dependent
-        #     self.letters_to_letter_states[c1[0]].dependent = True
-        #
-        # # now look at the addend digits
-        # if c1[1] == c1[2]:
-        #     if c1[1].dependent is None:
-        #         c1[1].dependent = True
-        # else:
-        #     if c1[1].dependent is None and c1[2].dependent is None:
-        #         # pick one to be independent
-        #         c1[1].dependent = False
-        #         c1[2].dependent = True
-        #     elif c1[1].dependent is None:
-        #         c1[1].dependent = True
-        #     elif c1[2].dependent is None:
-        #         c1[2].dependent = True
+    def sanity_check(self):
+        # dependent is set for every letter, and at least one is independent
+        found_indpendent = False
+        for k, v in self.letters_to_letter_states.items():
+            if v.dependent is None:
+                raise ValueError("digit dependence not determined:  %s" % v)
+            if not v.dependent:
+                found_indpendent = True
 
+        if not found_indpendent:
+            raise ValueError("no independent digits")
 
+        # all the digits in the sum are dependent
+        for c in self.result:
+            if not self.letters_to_letter_states[c].dependent:
+                raise ValueError("independent digit in sum:  %s" % c)
+
+        # at least one digit is independent
+
+        pass
 
 
 if __name__ == '__main__':
@@ -329,12 +345,32 @@ if __name__ == '__main__':
     print(addends)
     print(result)
 
+    s = SolutionGraph(addends, result)
+
 class SGTest(unittest.TestCase):
+    def test_6(self):
+        addends = ["OQ", "OY"]
+        result = "QX"
+
+        print(addends)
+        print(result)
+        s = SolutionGraph(addends, result)
+
     def test_5(self):
         addends = ["HY", "CV"]
         result = "VRS"
 
+        print(addends)
+        print(result)
         s = SolutionGraph(addends, result)
+
+        self.assertFalse(s.letters_to_letter_states['Y'].dependent)
+        self.assertFalse(s.letters_to_letter_states['H'].dependent)
+        self.assertFalse(s.letters_to_letter_states['C'].dependent)
+        self.assertTrue(s.letters_to_letter_states['V'].dependent)
+        self.assertTrue(s.letters_to_letter_states['R'].dependent)
+        self.assertTrue(s.letters_to_letter_states['S'].dependent)
+
 
     def test_1(self):
         addends = ["X", "X"]
