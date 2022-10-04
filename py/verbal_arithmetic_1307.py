@@ -331,9 +331,9 @@ class SolutionGraph(object):
                         self.letters_to_letter_states[col[1]].dependent = False
                         self.letters_to_letter_states[col[2]].dependent = False
                     elif self.letters_to_letter_states[col[1]].dependent is None:
-                        self.letters_to_letter_states[col[1]].dependent = True
+                        self.letters_to_letter_states[col[1]].dependent = False
                     elif self.letters_to_letter_states[col[2]].dependent is None:
-                        self.letters_to_letter_states[col[2]].dependent = True
+                        self.letters_to_letter_states[col[2]].dependent = False
 
         pprint(self.letters_to_letter_states)
         self.sanity_check()
@@ -369,6 +369,12 @@ if __name__ == '__main__':
         s = SolutionGraph(addends, result)
 
 class SGTest(unittest.TestCase):
+    def test_10(self):
+        addends = ['UTW', 'JJW']
+        result = 'WAUT'
+
+        s = SolutionGraph(addends, result)
+
     def test_9(self):
         addends = ["AQA", "DAH"]
         result = "WWAG"
