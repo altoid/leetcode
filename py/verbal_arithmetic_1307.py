@@ -94,20 +94,20 @@ def solution(addends, result):
     return solution_1(addends, result)
 
 
-def make_crypto_sum():
+def make_crypto_sum(low, high):
+    """
+    pick two random numbers in the range [low .. high].  compute their sum.  map the digits
+    in addends and sum to random letters.  return the addends and the sum.  the result
+    will be a cryptarithm that will always have a solution.
+    """
     letters = ''.join(random.sample(string.ascii_uppercase, 10))
-    print(letters)
     digits = ''.join([str(x) for x in range(10)])
-    print(digits)
     naddends = 2
-    addends = [random.randint(100, 10000) for _ in range(naddends)]
+    addends = [random.randint(low, high) for _ in range(naddends)]
     result = sum(addends)
-    print(addends, result)
     ttable = str.maketrans(digits, letters)
     addends_str = [x.translate(ttable) for x in list(map(str, addends))]
     result_str = str(result).translate(ttable)
-    print(addends_str)
-    print(result_str)
     return addends_str, result_str
 
 
@@ -222,9 +222,30 @@ class SolutionGraph(object):
         print(result_reversed)
         pprint(self.columns)
 
-        # traverse the first column, start with the sum digit
+        # deal with the special case where the sum is longer than either of the two addends.
+        # we have to look at this first.
+        # in that case we know that its leftmost digit is a 1.  but it makes the initialization
+        # very messy, because we would have to modify all the cases above to consider whether
+        # any of X, Y, Z are already known to be 1.
+        #
+        # case 1:  can't happen, no way X could be 1
+        # case 2:  Y could not be 1; it has to be even
+        # case 3:  X still has to be 0, it could never be 1.
+        # case 4:  if Z is the 1, then one of X, Y has to be dependent.  if X or Y is 1, then neither of X or Y
+        #          is independent.
+
+        if len(result_reversed) > max(map(len, addends_reversed)):
+            state = self.letters_to_letter_states[result[0]]
+            state.fixed = True
+            state.digit = 1
+            state.dependent = True
+
+        # traverse the first column, start with the sum digit.  be careful to consider
+        # whether any of X, Y, Z is 1.
+
         c0 = self.columns[0]
-        self.letters_to_letter_states[c0[0]].dependent = True
+        if self.letters_to_letter_states[c0[0]].dependent is None:
+            self.letters_to_letter_states[c0[0]].dependent = True
 
         # now the rest of the first column.  these are the cases:
         #
@@ -240,7 +261,9 @@ class SolutionGraph(object):
                 self.letters_to_letter_states[c0[0]].digit = 0
             else:
                 # case 2
-                self.letters_to_letter_states[c0[1]].dependent = False
+                if self.letters_to_letter_states[c0[1]].dependent is None:
+                    # it's not already 1
+                    self.letters_to_letter_states[c0[1]].dependent = False
         else:
             if c0[1] == c0[0]:
                 # case 3
@@ -253,19 +276,66 @@ class SolutionGraph(object):
                 self.letters_to_letter_states[c0[1]].dependent = False
                 self.letters_to_letter_states[c0[1]].digit = 0
             else:
-                self.letters_to_letter_states[c0[1]].dependent = False
-                self.letters_to_letter_states[c0[2]].dependent = False
+                # case 4
+                if self.letters_to_letter_states[c0[0]].digit is None:
+                    # Z was not set as the leftmost 1 of the sum.  but one of x or y could be.
+                    if self.letters_to_letter_states[c0[1]].digit is None and self.letters_to_letter_states[c0[2]].digit is None:
+                        self.letters_to_letter_states[c0[1]].dependent = False
+                        self.letters_to_letter_states[c0[2]].dependent = False
+                    elif self.letters_to_letter_states[c0[1]].digit is None:
+                        # Y is the 1
+                        self.letters_to_letter_states[c0[1]].dependent = True
+                    else:
+                        # X is the 1
+                        self.letters_to_letter_states[c0[2]].dependent = True
+                else:
+                    # then the addend digits are not the same.  pick one to be dependent
+                    self.letters_to_letter_states[c0[1]].dependent = False
+                    self.letters_to_letter_states[c0[2]].dependent = True
 
         pprint(self.letters_to_letter_states)
 
+        # # next column
+        # c1 = self.columns[1]
+        #
+        # if self.letters_to_letter_states[c1[0]].dependent is None:
+        #     # we haven't encountered this letter yet.  but if the first time we are seeing it is in the sum,
+        #     # it's definitely dependent
+        #     self.letters_to_letter_states[c1[0]].dependent = True
+        #
+        # # now look at the addend digits
+        # if c1[1] == c1[2]:
+        #     if c1[1].dependent is None:
+        #         c1[1].dependent = True
+        # else:
+        #     if c1[1].dependent is None and c1[2].dependent is None:
+        #         # pick one to be independent
+        #         c1[1].dependent = False
+        #         c1[2].dependent = True
+        #     elif c1[1].dependent is None:
+        #         c1[1].dependent = True
+        #     elif c1[2].dependent is None:
+        #         c1[2].dependent = True
+
+
+
 
 if __name__ == '__main__':
-    addends = ["SEND", "MORE"]
-    result = "MONEY"
-    s = SolutionGraph(addends, result)
+    # addends = ["SEND", "MORE"]
+    # result = "MONEY"
+    # s = SolutionGraph(addends, result)
 
+    addends, result = make_crypto_sum(10, 99)
+    print(addends)
+    print(result)
 
 class SGTest(unittest.TestCase):
+    def test_5(self):
+        addends = ["HY", "CV"]
+        result = "VRS"
+
+        s = SolutionGraph(addends, result)
+
     def test_1(self):
         addends = ["X", "X"]
         result = "X"
