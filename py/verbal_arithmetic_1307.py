@@ -288,42 +288,50 @@ class SolutionGraph(object):
                     self.letters_to_letter_states[c0[1]].dependent = False
                     self.letters_to_letter_states[c0[2]].dependent = True
 
-        # next column
-        if len(result_reversed) > 1:
-            c1 = self.columns[1]
-
-            if self.letters_to_letter_states[c1[0]].dependent is None:
+        # next columns
+        for col in self.columns[1:]:
+            if self.letters_to_letter_states[col[0]].dependent is None:
                 # we haven't encountered this letter yet.  but if the first time we are seeing it is in the sum,
                 # it's definitely dependent
-                self.letters_to_letter_states[c1[0]].dependent = True
+                self.letters_to_letter_states[col[0]].dependent = True
 
             # now look at the addend digits
-            if c1[1] == c1[2]:
-                if self.letters_to_letter_states[c1[1]].dependent is None:
-                    self.letters_to_letter_states[c1[1]].dependent = True
+
+            if len(col) == 1:
+                # leftmost digit in sum is all alone
+                continue
+            elif len(col) == 2:
+                if self.letters_to_letter_states[col[1]].dependent is None:
+                    self.letters_to_letter_states[col[1]].dependent = False
+
+            if col[1] == col[2]:
+                if self.letters_to_letter_states[col[1]].dependent is None:
+                    self.letters_to_letter_states[col[1]].dependent = True
             else:
-                if self.letters_to_letter_states[c1[1]].dependent is None and self.letters_to_letter_states[c1[2]].dependent is None:
-                    self.letters_to_letter_states[c1[1]].dependent = False
-                    self.letters_to_letter_states[c1[2]].dependent = False
-                elif self.letters_to_letter_states[c1[1]].dependent is None:
-                    self.letters_to_letter_states[c1[1]].dependent = True
-                elif self.letters_to_letter_states[c1[2]].dependent is None:
-                    self.letters_to_letter_states[c1[2]].dependent = True
+                if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[col[2]].dependent is None:
+                    self.letters_to_letter_states[col[1]].dependent = False
+                    self.letters_to_letter_states[col[2]].dependent = False
+                elif self.letters_to_letter_states[col[1]].dependent is None:
+                    self.letters_to_letter_states[col[1]].dependent = True
+                elif self.letters_to_letter_states[col[2]].dependent is None:
+                    self.letters_to_letter_states[col[2]].dependent = True
 
         pprint(self.letters_to_letter_states)
         self.sanity_check()
 
     def sanity_check(self):
         # dependent is set for every letter, and at least one is independent
-        found_indpendent = False
+        found_independent = False
         for k, v in self.letters_to_letter_states.items():
             if v.dependent is None:
                 raise ValueError("digit dependence not determined:  %s" % v)
             if not v.dependent:
-                found_indpendent = True
+                found_independent = True
 
-        if not found_indpendent:
-            raise ValueError("no independent digits")
+        if not found_independent:
+            # this is ok for the case X+X=X.  but no others.
+            if len(self.letters_to_letter_states) > 1:
+                raise ValueError("no independent digits")
 
         # # all the digits in the sum are dependent
         # for c in self.result:
