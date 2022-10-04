@@ -94,16 +94,18 @@ def solution(addends, result):
     return solution_1(addends, result)
 
 
-def make_crypto_sum(low, high):
+def make_crypto_sum(a1_digits, a2_digits):
     """
-    pick two random numbers in the range [low .. high].  compute their sum.  map the digits
+    pick two random numbers with the given number of digits.  compute their sum.  map the digits
     in addends and sum to random letters.  return the addends and the sum.  the result
     will be a cryptarithm that will always have a solution.
     """
     letters = ''.join(random.sample(string.ascii_uppercase, 10))
     digits = ''.join([str(x) for x in range(10)])
     naddends = 2
-    addends = [random.randint(low, high) for _ in range(naddends)]
+    a1 = random.randint(10 ** (a1_digits - 1), 10 ** a1_digits - 1)
+    a2 = random.randint(10 ** (a2_digits - 1), 10 ** a2_digits - 1)
+    addends = [a1, a2]
     result = sum(addends)
     ttable = str.maketrans(digits, letters)
     addends_str = [x.translate(ttable) for x in list(map(str, addends))]
@@ -365,7 +367,7 @@ if __name__ == '__main__':
     # s = SolutionGraph(addends, result)
 
     for _ in range(10000):
-        addends, result = make_crypto_sum(1, 999999)
+        addends, result = make_crypto_sum(4, 9)
 
         s = SolutionGraph(addends, result)
 
