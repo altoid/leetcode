@@ -319,10 +319,12 @@ class SolutionGraph(object):
             else:
                 if col[0] == col[1]:
                     # case 3
-                    self.letters_to_letter_states[c0[0]].dependent = False
+                    self.letters_to_letter_states[col[0]].dependent = False
+                    self.letters_to_letter_states[col[2]].dependent = True
                 elif col[0] == col[2]:
                     # also case 3
-                    self.letters_to_letter_states[c0[0]].dependent = False
+                    self.letters_to_letter_states[col[0]].dependent = False
+                    self.letters_to_letter_states[col[1]].dependent = True
                 else:
                     # case 4
                     if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[col[2]].dependent is None:
@@ -341,7 +343,7 @@ class SolutionGraph(object):
         found_independent = False
         for k, v in self.letters_to_letter_states.items():
             if v.dependent is None:
-                raise ValueError("digit dependence not determined:  %s" % v)
+                raise ValueError("digit dependence not determined:  %s" % k)
             if not v.dependent:
                 found_independent = True
 
@@ -367,6 +369,12 @@ if __name__ == '__main__':
         s = SolutionGraph(addends, result)
 
 class SGTest(unittest.TestCase):
+    def test_9(self):
+        addends = ["AQA", "DAH"]
+        result = "WWAG"
+
+        s = SolutionGraph(addends, result)
+
     def test_8(self):
         addends = ["BJJ", "YPJ"]
         result = "BJPJ"
@@ -398,30 +406,16 @@ class SGTest(unittest.TestCase):
         self.assertTrue(s.letters_to_letter_states['R'].dependent)
         self.assertTrue(s.letters_to_letter_states['S'].dependent)
 
-
-    def test_1(self):
-        addends = ["X", "X"]
-        result = "X"
-        s = SolutionGraph(addends, result)
-
-        c0 = s.columns[0]
-        self.assertEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[1]])
-        self.assertEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[2]])
-        self.assertTrue(s.letters_to_letter_states[c0[0]].fixed)
-        self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
-        self.assertTrue(s.letters_to_letter_states[c0[0]].can_be_zero)
-        self.assertEqual(0, s.letters_to_letter_states[c0[0]].digit)
-        for x in c0:
-            pprint(s.letters_to_letter_states[x])
-
-    def test_2(self):
-        addends = ["X", "X"]
-        result = "Y"
+    def test_4(self):
+        addends = ["X", "Y"]
+        result = "Z"
         s = SolutionGraph(addends, result)
 
         c0 = s.columns[0]
         self.assertNotEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[1]])
-        self.assertEqual(s.letters_to_letter_states[c0[1]], s.letters_to_letter_states[c0[2]])
+        self.assertNotEqual(s.letters_to_letter_states[c0[1]], s.letters_to_letter_states[c0[2]])
+        self.assertNotEqual(s.letters_to_letter_states[c0[2]], s.letters_to_letter_states[c0[0]])
+
         self.assertFalse(s.letters_to_letter_states[c0[0]].fixed)
         self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
         self.assertIsNone(s.letters_to_letter_states[c0[0]].digit)
@@ -431,6 +425,11 @@ class SGTest(unittest.TestCase):
         self.assertFalse(s.letters_to_letter_states[c0[1]].dependent)
         self.assertIsNone(s.letters_to_letter_states[c0[1]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[1]].can_be_zero)
+
+        self.assertFalse(s.letters_to_letter_states[c0[2]].fixed)
+        self.assertFalse(s.letters_to_letter_states[c0[2]].dependent)
+        self.assertIsNone(s.letters_to_letter_states[c0[2]].digit)
+        self.assertTrue(s.letters_to_letter_states[c0[2]].can_be_zero)
 
     def test_3(self):
         addends = ["X", "Y"]
@@ -470,16 +469,14 @@ class SGTest(unittest.TestCase):
         self.assertEqual(0, s.letters_to_letter_states[c0[1]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[1]].can_be_zero)
 
-    def test_4(self):
-        addends = ["X", "Y"]
-        result = "Z"
+    def test_2(self):
+        addends = ["X", "X"]
+        result = "Y"
         s = SolutionGraph(addends, result)
 
         c0 = s.columns[0]
         self.assertNotEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[1]])
-        self.assertNotEqual(s.letters_to_letter_states[c0[1]], s.letters_to_letter_states[c0[2]])
-        self.assertNotEqual(s.letters_to_letter_states[c0[2]], s.letters_to_letter_states[c0[0]])
-
+        self.assertEqual(s.letters_to_letter_states[c0[1]], s.letters_to_letter_states[c0[2]])
         self.assertFalse(s.letters_to_letter_states[c0[0]].fixed)
         self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
         self.assertIsNone(s.letters_to_letter_states[c0[0]].digit)
@@ -490,10 +487,21 @@ class SGTest(unittest.TestCase):
         self.assertIsNone(s.letters_to_letter_states[c0[1]].digit)
         self.assertTrue(s.letters_to_letter_states[c0[1]].can_be_zero)
 
-        self.assertFalse(s.letters_to_letter_states[c0[2]].fixed)
-        self.assertFalse(s.letters_to_letter_states[c0[2]].dependent)
-        self.assertIsNone(s.letters_to_letter_states[c0[2]].digit)
-        self.assertTrue(s.letters_to_letter_states[c0[2]].can_be_zero)
+    def test_1(self):
+        addends = ["X", "X"]
+        result = "X"
+        s = SolutionGraph(addends, result)
+
+        c0 = s.columns[0]
+        self.assertEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[1]])
+        self.assertEqual(s.letters_to_letter_states[c0[0]], s.letters_to_letter_states[c0[2]])
+        self.assertTrue(s.letters_to_letter_states[c0[0]].fixed)
+        self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
+        self.assertTrue(s.letters_to_letter_states[c0[0]].can_be_zero)
+        self.assertEqual(0, s.letters_to_letter_states[c0[0]].digit)
+        for x in c0:
+            pprint(s.letters_to_letter_states[x])
+
 
 
 class MyTest(unittest.TestCase):
