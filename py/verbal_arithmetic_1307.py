@@ -220,7 +220,7 @@ class SolutionGraph(object):
             self.columns.append(column)
             i += 1
 
-        #pprint(self.columns)
+        # pprint(self.columns)
 
         # deal with the special case where the sum is longer than either of the two addends.
         # we have to look at this first.
@@ -281,7 +281,8 @@ class SolutionGraph(object):
                 # case 4
                 if self.letters_to_letter_states[c0[0]].digit is None:
                     # Z was not set as the leftmost 1 of the sum.  but one of x or y could be.
-                    if self.letters_to_letter_states[c0[1]].digit is None and self.letters_to_letter_states[c0[2]].digit is None:
+                    if self.letters_to_letter_states[c0[1]].digit is None and self.letters_to_letter_states[
+                        c0[2]].digit is None:
                         self.letters_to_letter_states[c0[1]].dependent = False
                         self.letters_to_letter_states[c0[2]].dependent = False
                     elif self.letters_to_letter_states[c0[1]].digit is None:
@@ -330,7 +331,8 @@ class SolutionGraph(object):
                     self.letters_to_letter_states[col[1]].dependent = True
                 else:
                     # case 4
-                    if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[col[2]].dependent is None:
+                    if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[
+                        col[2]].dependent is None:
                         self.letters_to_letter_states[col[1]].dependent = False
                         self.letters_to_letter_states[col[2]].dependent = False
                     elif self.letters_to_letter_states[col[1]].dependent is None:
@@ -371,7 +373,8 @@ if __name__ == '__main__':
 
         s = SolutionGraph(addends, result)
 
-class SGTest(unittest.TestCase):
+
+class InitializationTest(unittest.TestCase):
     def test_10(self):
         addends = ['UTW', 'JJW']
         result = 'WAUT'
@@ -510,7 +513,6 @@ class SGTest(unittest.TestCase):
         self.assertEqual(0, s.letters_to_letter_states[c0[0]].digit)
         for x in c0:
             pprint(s.letters_to_letter_states[x])
-
 
 
 class MyTest(unittest.TestCase):
