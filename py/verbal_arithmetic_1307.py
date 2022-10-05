@@ -196,6 +196,9 @@ class Column(object):
     def __getitem__(self, item):
         return self.column[item]
 
+    def __str__(self):
+        return str(self.column)
+
     def num_unique_digits(self):
         return len(self.unique_digits)
 
@@ -244,7 +247,7 @@ class SolutionGraph(object):
 
         i = 0
         while i < len(result_reversed):
-            column = []
+            column = Column()
             column.append(result_reversed[i])
             for a in addends_reversed:
                 if i < len(a):
@@ -375,6 +378,14 @@ class SolutionGraph(object):
         pprint(self.letters_to_letter_states)
         self.sanity_check()
 
+    def num_dependent_unique_digits(self, col):
+        dependent_count = 0
+        for k in col.unique_digits.keys():
+            if self.letters_to_letter_states[k].dependent:
+                dependent_count += 1
+
+        return dependent_count
+
     def sanity_check(self):
         # dependent is set for every letter, and at least one is independent
         found_independent = False
@@ -389,10 +400,10 @@ class SolutionGraph(object):
             if len(self.letters_to_letter_states) > 1:
                 raise ValueError("no independent digits")
 
-        # # all the digits in the sum are dependent
-        # for c in self.result:
-        #     if not self.letters_to_letter_states[c].dependent:
-        #         raise ValueError("independent digit in sum:  %s" % c)
+        # in each column, there is at most one unique digit that is dependent.
+        for col in self.columns:
+            if self.num_dependent_unique_digits(col) > 1:
+                raise ValueError("too many dependent digits in column:  %s" % col)
 
 
 if __name__ == '__main__':
@@ -418,13 +429,14 @@ class ColumnTest(unittest.TestCase):
         self.assertEqual(3, col.num_unique_digits())
         self.assertEqual(2, col.unique_digits['D'])
         self.assertEqual(1, col.unique_digits['Y'])
+        self.assertEqual("""['Y', 'E', 'D', 'E', 'D']""", str(col))
 
     def test_2(self):
         col = Column()
 
         for c in ['Y', 'E', 'D', 'E', 'D']:
             col.append(c)
-            
+
         self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
         self.assertEqual('E', col[1])
         self.assertEqual('D', col[-1])
