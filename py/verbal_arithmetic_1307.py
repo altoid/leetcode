@@ -174,6 +174,38 @@ class LetterState(object):
         return self.__repr__()
 
 
+class Column(object):
+    def __init__(self, column=None):
+        # the full set of digits in one column of the sum, starting with the sum digit and going upward.
+        self.column = column if column else []
+
+        # map each digit to the number of times it appears in the column.
+        self.unique_digits = {}
+        for c in self.column:
+            if c not in self.unique_digits:
+                self.unique_digits[c] = 0
+            self.unique_digits[c] += 1
+
+    def __iter__(self):
+        for c in self.column:
+            yield c
+
+    def __len__(self):
+        return len(self.column)
+
+    def __getitem__(self, item):
+        return self.column[item]
+
+    def num_unique_digits(self):
+        return len(self.unique_digits)
+
+    def append(self, c):
+        if c not in self.unique_digits:
+            self.unique_digits[c] = 0
+        self.unique_digits[c] += 1
+        self.column.append(c)
+
+
 class SolutionGraph(object):
     def __init__(self, addends, result):
         self.addends = addends
@@ -373,6 +405,33 @@ if __name__ == '__main__':
 
         s = SolutionGraph(addends, result)
 
+
+class ColumnTest(unittest.TestCase):
+    def test_1(self):
+        col = Column(['Y', 'E', 'D', 'E'])
+        col.append('D')
+
+        self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
+        self.assertEqual('E', col[1])
+        self.assertEqual('D', col[-1])
+        self.assertEqual(5, len(col))
+        self.assertEqual(3, col.num_unique_digits())
+        self.assertEqual(2, col.unique_digits['D'])
+        self.assertEqual(1, col.unique_digits['Y'])
+
+    def test_2(self):
+        col = Column()
+
+        for c in ['Y', 'E', 'D', 'E', 'D']:
+            col.append(c)
+            
+        self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
+        self.assertEqual('E', col[1])
+        self.assertEqual('D', col[-1])
+        self.assertEqual(5, len(col))
+        self.assertEqual(3, col.num_unique_digits())
+        self.assertEqual(2, col.unique_digits['D'])
+        self.assertEqual(1, col.unique_digits['Y'])
 
 class InitializationTest(unittest.TestCase):
     def test_10(self):
