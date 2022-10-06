@@ -390,16 +390,15 @@ class SolutionGraph(object):
         self.digits_used[digit] = False
         self.letters_to_letter_states[assigned_to].digit = None
 
-    def num_unique_digits_unset(self, col):
-        # for this column, count the number digits that are not set.  if there is more than 2,
-        # we can't proceed.
+    def unmapped_letters(self, col):
+        # for this column, return a list of the unique letters that aren't mapped to any digits.
 
-        unset_count = 0
+        result = []
         for k in col.unique_digits.keys():
             if self.letters_to_letter_states[k].digit is None:
-                unset_count += 1
+                result.append(k)
 
-        return unset_count
+        return result
 
     def sanity_check(self):
         # dependent is set for every letter, and at least one is independent
@@ -451,58 +450,70 @@ class SolutionGraph(object):
 
         carry = 0
         for col in self.columns:
-            if self.num_unique_digits_unset(col) == 0:
+            unmapped_letters = self.unmapped_letters(col)
+
+            if len(unmapped_letters) == 0:
                 # don't have to determine a missing digit!  but see if this adds up.
                 column_sum = self.sum_of_addends(col) + carry
                 carry, digit = divmod(column_sum, 10)
                 if digit != self.letters_to_letter_states[col[0]].digit:
                     permutation_is_good = False
-            elif self.num_unique_digits_unset(col) == 1:
+            elif len(unmapped_letters) == 1:
                 # cases:
                 # 1.  unset digit is the sum digit
                 # 2.  unset digit is in the addends
                 # 3.  unset digit is in both places
 
                 sum_letter = col[0]
-                sum_letter_count = col.unique_digits[sum_letter]
-                if sum_letter_count == 1:
-                    if self.letters_to_letter_states[sum_letter].digit is None:
+                if self.letters_to_letter_states[sum_letter].digit is None:
+                    sum_letter_count = col.unique_digits[sum_letter]
+                    if sum_letter_count == 1:
                         # case 1
                         column_sum = self.sum_of_addends(col) + carry
                         carry, missing_digit = divmod(column_sum, 10)
+                        if self.digits_used[missing_digit]:
+                            # we've already used this digit, permutation is no good
+                            permutation_is_good = False
+                        else:
+                            self.assign_digit(missing_digit, sum_letter)
                     else:
-                        # case 2
-                        partial_sum = self.sum_of_addends(col) + carry
-                        addend_digit = self.letters_to_letter_states[sum_letter].digit
-                        column_sum = addend_digit
-                        while column_sum < partial_sum:
-                            column_sum += 10
-                        missing_digit = column_sum - partial_sum
-                        assert 0 <= missing_digit <= 9
-                        carry = column_sum % 10
+                        # case 3.  we have work to do
+                        # column looks like X - - X - X - -
+                        # try all the unused digits one by one
+                        foundit = False
+                        for k in self.digits_used.keys():
+                            if self.digits_used[k]:
+                                continue
 
-                    if self.digits_used[missing_digit]:
-                        # we've already used this digit, permutation is no good
-                        permutation_is_good = False
-                    else:
-                        self.assign_digit(missing_digit, sum_letter)
+                            column_sum = self.sum_of_addends(col) + (sum_letter_count - 1) * k + carry
+                            carry, missing_digit = divmod(column_sum, 10)
+                            if missing_digit == k:
+                                foundit = True
+                                self.assign_digit(missing_digit, sum_letter)
+                                break
+                        if not foundit:
+                            permutation_is_good = False
                 else:
-                    # case 3.  we have work to do
-                    # column looks like X - - X - X - -
-                    # try all the unused digits one by one
-                    foundit = False
+                    # case 2.  unset digit is in the addends.  it might appear more than once.
+                    # there can be multiple unused digits that would work.  try all possibilities,
+                    # abort if > 1 works.
+
+                    candidates = []
+                    missing_digit_count = col.unique_digits[unmapped_letters[0]]
                     for k in self.digits_used.keys():
                         if self.digits_used[k]:
                             continue
 
-                        column_sum = self.sum_of_addends(col) + (sum_letter_count - 1) * k + carry
-                        carry, missing_digit = divmod(column_sum, 10)
-                        if missing_digit == k:
-                            foundit = True
-                            self.assign_digit(missing_digit, sum_letter)
-                            break
-                    if not foundit:
+                        if (missing_digit_count * k) % 10 == (self.letters_to_letter_states[sum_letter].digit - carry - self.sum_of_addends(col)) % 10:
+                            candidates.append(k)
+                    if not candidates:
                         permutation_is_good = False
+                    elif len(candidates) == 1:
+                        self.assign_digit(candidates[0], unmapped_letters[0])
+                        column_sum = self.sum_of_addends(col)
+                        carry = column_sum // 10
+                    else:
+                        raise ValueError("multiple suitable digits for %s:  %s" % (unmapped_letters[0], candidates))
             else:
                 raise ValueError("too many unset digits in column:  %s" % col)
 
@@ -532,7 +543,6 @@ class SolutionGraph(object):
                 digits.remove(self.letters_to_letter_states[k].digit)
 
         for p in permutations(digits, len(independent_letters)):
-
             if self.permutation_works(p, independent_letters):
                 addends = [self.decrypt_letter_string(a) for a in self.addends]
                 result = self.decrypt_letter_string(self.result)
@@ -571,7 +581,10 @@ class SolveTest(unittest.TestCase):
 
         s = SolutionGraph(addends, result)
         works = s.permutation_works((2, 3, 9), ['D', 'S', 'G'])
-        self.assertTrue(works)
+        self.assertFalse(works)
+
+        f = s.solution()
+        self.assertIsNotNone(f)
 
     def test_2(self):
         addends = ["TQ", "CW"]  # 86, 37
@@ -586,14 +599,16 @@ class SolveTest(unittest.TestCase):
         result = "VRS"
 
         s = SolutionGraph(addends, result)
-        self.assertIs(s.solution())
+        result = s.solution()
+        self.assertIsNotNone(result)
 
     def test_0(self):
         addends = ["SEND", "MORE"]
         result = "MONEY"
 
         s = SolutionGraph(addends, result)
-        self.assertIs(s.solution())
+        result = s.solution()
+        self.assertIsNotNone(result)
 
 
 class InitializationTest(unittest.TestCase):
