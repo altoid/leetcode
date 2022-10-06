@@ -110,7 +110,7 @@ def make_crypto_sum(a1_digits, a2_digits):
     ttable = str.maketrans(digits, letters)
     addends_str = [x.translate(ttable) for x in list(map(str, addends))]
     result_str = str(result).translate(ttable)
-    return addends_str, result_str
+    return addends_str, result_str, addends, result
 
 
 #
@@ -157,9 +157,6 @@ class LetterState(object):
     def __init__(self):
         self.digit = None
 
-        # not set during initialization
-        self.visited = False
-
         # fixed means we can determine the digit a letter maps to before we traverse all the letters.
         self.fixed = False
 
@@ -179,7 +176,7 @@ class Column(object):
         # the full set of digits in one column of the sum, starting with the sum digit and going upward.
         self.column = column if column else []
 
-        # map each digit to the number of times it appears in the column.
+        # map each digit to the number of times it appears in the column, including as the sum digit
         self.unique_digits = {}
         for c in self.column:
             if c not in self.unique_digits:
@@ -215,6 +212,11 @@ class SolutionGraph(object):
         self.result = result
         self.letters_to_letter_states = {}
         self.columns = []
+        self.digits_used = {}
+
+        # maps digits to the letters that got mapped to them.
+        self.digit_mapping = dict(zip(range(10), [False] * 10))
+        self.digits_used = dict(zip(range(10), [False] * 10))
 
         print("addends = %s" % addends)
         print("result = '%s'" % result)
@@ -272,7 +274,7 @@ class SolutionGraph(object):
         if len(result_reversed) > max(map(len, addends_reversed)):
             state = self.letters_to_letter_states[result[0]]
             state.fixed = True
-            state.digit = 1
+            self.assign_digit(1, result[0])
             state.dependent = True
 
         # traverse the first column, start with the sum digit.  be careful to consider
@@ -293,7 +295,7 @@ class SolutionGraph(object):
             if c0[0] == c0[1]:
                 # case 1
                 self.letters_to_letter_states[c0[0]].fixed = True
-                self.letters_to_letter_states[c0[0]].digit = 0
+                self.assign_digit(0, c0[0])
             else:
                 # case 2
                 if self.letters_to_letter_states[c0[1]].dependent is None:
@@ -304,13 +306,13 @@ class SolutionGraph(object):
                 # case 3
                 self.letters_to_letter_states[c0[2]].fixed = True
                 self.letters_to_letter_states[c0[2]].dependent = True
-                self.letters_to_letter_states[c0[2]].digit = 0
+                self.assign_digit(0, c0[2])
                 self.letters_to_letter_states[c0[0]].dependent = False
             elif c0[0] == c0[2]:
                 # also case 3
                 self.letters_to_letter_states[c0[1]].fixed = True
                 self.letters_to_letter_states[c0[1]].dependent = True
-                self.letters_to_letter_states[c0[1]].digit = 0
+                self.assign_digit(0, c0[1])
                 self.letters_to_letter_states[c0[0]].dependent = False
             else:
                 # case 4
@@ -378,13 +380,27 @@ class SolutionGraph(object):
         pprint(self.letters_to_letter_states)
         self.sanity_check()
 
-    def num_dependent_unique_digits(self, col):
-        dependent_count = 0
-        for k in col.unique_digits.keys():
-            if self.letters_to_letter_states[k].dependent:
-                dependent_count += 1
+    def assign_digit(self, digit, letter):
+        self.digits_used[digit] = True
+        self.digit_mapping[digit] = letter
+        self.letters_to_letter_states[letter].digit = digit
 
-        return dependent_count
+    def unassign_digit(self, digit):
+        assigned_to = self.digit_mapping[digit]
+        self.digit_mapping[digit] = None
+        self.digits_used[digit] = False
+        self.letters_to_letter_states[assigned_to].digit = None
+
+    def num_unique_digits_unset(self, col):
+        # for this column, count the number digits that are not set.  if there is more than 2,
+        # we can't proceed.
+
+        unset_count = 0
+        for k in col.unique_digits.keys():
+            if self.letters_to_letter_states[k].digit is None:
+                unset_count += 1
+
+        return unset_count
 
     def sanity_check(self):
         # dependent is set for every letter, and at least one is independent
@@ -400,10 +416,137 @@ class SolutionGraph(object):
             if len(self.letters_to_letter_states) > 1:
                 raise ValueError("no independent digits")
 
-        # in each column, there is at most one unique digit that is dependent.
-        for col in self.columns:
-            if self.num_dependent_unique_digits(col) > 1:
-                raise ValueError("too many dependent digits in column:  %s" % col)
+    def sum_of_addends(self, col):
+        # TODO make this more pythonic
+        total = 0
+        for c in col[1:]:
+            if self.letters_to_letter_states[c].digit is not None:
+                total += self.letters_to_letter_states[c].digit
+        return total
+
+    def unwind_mapping(self):
+        for k in self.letters_to_letter_states.keys():
+            ls = self.letters_to_letter_states[k]
+            if not ls.fixed and ls.digit is not None:
+                self.unassign_digit(ls.digit)
+
+    def decrypt_letter_string(self, w):
+        result = [self.letters_to_letter_states[x].digit for x in list(w)]
+        return int(''.join(list(map(str, result))))
+
+    def checksum(self):
+        """
+        verify a mapping.  assumes all of the letters have been mapped to digits.
+        """
+        addends = [self.decrypt_letter_string(a) for a in self.addends]
+        result = self.decrypt_letter_string(self.result)
+        print(self.addends)
+        print(self.result)
+        print(addends)
+        print(result)
+        if result == sum(addends):
+            print("######## mapping is correct")
+        else:
+            print("######## we have a bug")
+
+    def solve(self):
+        # identify all of the independent letters.  eliminate 1 and 0 if these have already been determined.
+        # this should work for > 2 addends.
+
+        independent = dict(filter(lambda x: x[1].dependent == False, self.letters_to_letter_states.items()))
+        dependent = dict(filter(lambda x: x[1].dependent == True, self.letters_to_letter_states.items()))
+
+        independent_letters = list(independent.keys())
+        pprint(independent_letters)
+        digits = {x for x in range(10)}
+        for l in dependent.keys():
+            if self.letters_to_letter_states[l].digit is not None:
+                digits.remove(self.letters_to_letter_states[l].digit)
+
+        for p in permutations(digits, len(independent_letters)):
+            zipp = dict(zip(independent_letters, p))
+            ppiz = dict(zip(p, independent_letters))
+            if 0 in ppiz:
+                zerodigit = ppiz[0]
+                if not self.letters_to_letter_states[zerodigit].can_be_zero:
+                    #print("%s cannot map to 0, trying another" % zerodigit)
+                    continue
+            #print(zipp)
+
+            for l in independent_letters:
+                self.assign_digit(zipp[l], l)
+#            pprint(self.letters_to_letter_states)
+
+            permutation_is_good = True
+
+            carry = 0
+            for col in self.columns:
+                if self.num_unique_digits_unset(col) == 0:
+                    # don't have to determine a missing digit!  but see if this adds up.
+                    column_sum = self.sum_of_addends(col) + carry
+                    carry, digit = divmod(column_sum, 10)
+                    if digit != self.letters_to_letter_states[col[0]]:
+                        permutation_is_good = False
+                elif self.num_unique_digits_unset(col) == 1:
+                    # cases:
+                    # 1.  unset digit is the sum digit
+                    # 2.  unset digit is in the addends
+                    # 3.  unset digit is in both places
+
+                    sum_letter = col[0]
+                    sum_letter_count = col.unique_digits[sum_letter]
+                    if sum_letter_count == 1:
+                        if self.letters_to_letter_states[sum_letter].digit is None:
+                            # case 1
+                            column_sum = self.sum_of_addends(col) + carry
+                            carry, missing_digit = divmod(column_sum, 10)
+                        else:
+                            # case 2
+                            partial_sum = self.sum_of_addends(col) + carry
+                            addend_digit = self.letters_to_letter_states[sum_letter].digit
+                            column_sum = addend_digit
+                            while column_sum < partial_sum:
+                                column_sum += 10
+                            missing_digit = column_sum - partial_sum
+                            assert 0 <= missing_digit <= 9
+                            carry = column_sum % 10
+
+                        if self.digits_used[missing_digit]:
+                            # we've already used this digit, permutation is no good
+                            permutation_is_good = False
+                        else:
+                            self.assign_digit(missing_digit, sum_letter)
+                    else:
+                        # case 3.  we have work to do
+                        # column looks like X - - X - X - -
+                        # try all the unused digits one by one
+                        foundit = False
+                        for k in self.digits_used.keys():
+                            if self.digits_used[k]:
+                                continue
+
+                            column_sum = self.sum_of_addends(col) + (sum_letter_count - 1) * k + carry
+                            carry, missing_digit = divmod(column_sum, 10)
+                            if missing_digit == k:
+                                foundit = True
+                                self.assign_digit(missing_digit, sum_letter)
+                                break
+                        if not foundit:
+                            permutation_is_good = False
+                else:
+                    raise ValueError("too many unset digits in column:  %s" % col)
+
+                if not permutation_is_good:
+                    break
+
+            if permutation_is_good:
+                self.checksum()
+                return True
+
+            # shit, try again
+            self.unwind_mapping()
+
+        return False
 
 
 if __name__ == '__main__':
@@ -411,41 +554,53 @@ if __name__ == '__main__':
     # result = "MONEY"
     # s = SolutionGraph(addends, result)
 
-    for _ in range(10000):
-        addends, result = make_crypto_sum(4, 9)
+    # for _ in range(10):
+    #     addends, result = make_crypto_sum(3, 3)
+    #
+    #     s = SolutionGraph(addends, result)
+
+    addends_str, result_str, addends, result = make_crypto_sum(2, 2)
+    s = SolutionGraph(addends_str, result_str)
+    if not s.solve():
+        print("addends_str = %s" % addends_str)
+        print("result_str = '%s'" % result_str)
+        print("addends = %s" % addends)
+        print("result = %s" % result)
+
+        print("incorrectly determined to be not solvable")
+
+
+class SolveTest(unittest.TestCase):
+    def test_2(self):
+        addends = ["TQ", "CW"]   # 86, 37
+        result = "NFC"           # 123
+
+        s = SolutionGraph(addends, result)
+        works = s.solve()
+        self.assertTrue(works)
+
+    def test_1(self):
+        addends = ["HY", "CV"]
+        result = "VRS"
+
+        s = SolutionGraph(addends, result)
+        self.assertTrue(s.solve())
+
+    def test_0(self):
+        addends = ["SEND", "MORE"]
+        result = "MONEY"
+
+        s = SolutionGraph(addends, result)
+        self.assertTrue(s.solve())
+
+
+class InitializationTest(unittest.TestCase):
+    def test_11(self):
+        addends = ['SCC', 'NEE']
+        result = 'LNJ'
 
         s = SolutionGraph(addends, result)
 
-
-class ColumnTest(unittest.TestCase):
-    def test_1(self):
-        col = Column(['Y', 'E', 'D', 'E'])
-        col.append('D')
-
-        self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
-        self.assertEqual('E', col[1])
-        self.assertEqual('D', col[-1])
-        self.assertEqual(5, len(col))
-        self.assertEqual(3, col.num_unique_digits())
-        self.assertEqual(2, col.unique_digits['D'])
-        self.assertEqual(1, col.unique_digits['Y'])
-        self.assertEqual("""['Y', 'E', 'D', 'E', 'D']""", str(col))
-
-    def test_2(self):
-        col = Column()
-
-        for c in ['Y', 'E', 'D', 'E', 'D']:
-            col.append(c)
-
-        self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
-        self.assertEqual('E', col[1])
-        self.assertEqual('D', col[-1])
-        self.assertEqual(5, len(col))
-        self.assertEqual(3, col.num_unique_digits())
-        self.assertEqual(2, col.unique_digits['D'])
-        self.assertEqual(1, col.unique_digits['Y'])
-
-class InitializationTest(unittest.TestCase):
     def test_10(self):
         addends = ['UTW', 'JJW']
         result = 'WAUT'
@@ -584,6 +739,35 @@ class InitializationTest(unittest.TestCase):
         self.assertEqual(0, s.letters_to_letter_states[c0[0]].digit)
         for x in c0:
             pprint(s.letters_to_letter_states[x])
+
+
+class ColumnTest(unittest.TestCase):
+    def test_1(self):
+        col = Column(['Y', 'E', 'D', 'E'])
+        col.append('D')
+
+        self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
+        self.assertEqual('E', col[1])
+        self.assertEqual('D', col[-1])
+        self.assertEqual(5, len(col))
+        self.assertEqual(3, col.num_unique_digits())
+        self.assertEqual(2, col.unique_digits['D'])
+        self.assertEqual(1, col.unique_digits['Y'])
+        self.assertEqual("""['Y', 'E', 'D', 'E', 'D']""", str(col))
+
+    def test_2(self):
+        col = Column()
+
+        for c in ['Y', 'E', 'D', 'E', 'D']:
+            col.append(c)
+
+        self.assertEqual(['Y', 'E', 'D', 'E', 'D'], [x for x in col])
+        self.assertEqual('E', col[1])
+        self.assertEqual('D', col[-1])
+        self.assertEqual(5, len(col))
+        self.assertEqual(3, col.num_unique_digits())
+        self.assertEqual(2, col.unique_digits['D'])
+        self.assertEqual(1, col.unique_digits['Y'])
 
 
 class MyTest(unittest.TestCase):
