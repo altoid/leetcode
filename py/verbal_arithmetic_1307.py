@@ -445,9 +445,9 @@ class SolutionGraph(object):
         zipp = dict(zip(independent_letters, p))
         if 0 in p:
             ppiz = dict(zip(p, independent_letters))
-            zerodigit = ppiz[0]
-            if not self.letters_to_letter_states[zerodigit].can_be_zero:
-                # print("%s cannot map to 0, trying another" % zerodigit)
+            zeroletter = ppiz[0]
+            if not self.letters_to_letter_states[zeroletter].can_be_zero:
+                # print("%s cannot map to 0, trying another" % zeroletter)
                 return False
 
         for l in independent_letters:
@@ -493,17 +493,18 @@ class SolutionGraph(object):
                                 continue
 
                             column_sum = self.sum_of_addends(col) + (sum_letter_count - 1) * k + carry
-                            carry, missing_digit = divmod(column_sum, 10)
+                            new_carry, missing_digit = divmod(column_sum, 10)
                             if missing_digit == k:
                                 foundit = True
                                 self.assign_digit(missing_digit, sum_letter)
+                                carry = new_carry
                                 break
                         if not foundit:
                             permutation_is_good = False
                 else:
                     # case 2.  unset digit is in the addends.  it might appear more than once.
                     # there can be multiple unused digits that would work.  try all possibilities,
-                    # abort if > 1 works.
+                    # abort if there are multiple candidates.
 
                     candidates = []
                     missing_digit_count = col.unique_digits[unmapped_letters[0]]
@@ -527,7 +528,11 @@ class SolutionGraph(object):
                 raise ValueError("too many unset digits in column:  %s" % col)
 
             if not permutation_is_good:
+                #print("%s:  nope" % zipp)
                 break
+
+        if carry != 0:
+            permutation_is_good = False
 
         if permutation_is_good:
             # pprint(list(zip(independent_letters, p)))
@@ -549,7 +554,7 @@ class SolutionGraph(object):
         independent = dict(filter(lambda x: x[1].dependent == False, self.letters_to_letter_states.items()))
 
         independent_letters = list(independent.keys())
-        pprint(independent_letters)
+        #pprint(independent_letters)
         digits = {x for x in range(10)}
         for k in self.letters_to_letter_states.keys():
             if self.letters_to_letter_states[k].fixed:
@@ -559,7 +564,15 @@ class SolutionGraph(object):
             if self.permutation_works(p, independent_letters):
                 addends = [self.decrypt_letter_string(a) for a in self.addends]
                 result = self.decrypt_letter_string(self.result)
-                assert sum(addends) == result
+                if sum(addends) != result:
+                    print("it don't add up")
+                    print(p, independent_letters)
+                    print(self.addends)
+                    print(self.result)
+                    print(addends)
+                    print(result)
+                    pprint(self.letters_to_letter_states)
+                    return None
                 return addends, result
 
             # shit, try again
@@ -582,27 +595,51 @@ if __name__ == '__main__':
     #
     #     s = SolutionGraph(addends, result)
 
-    for _ in range(10):
+    for _ in range(100):
         addends_str, result_str, addends, result = make_crypto_sum(2, 2)
         s = SolutionGraph(addends_str, result_str)
         if not s.solution():
-            print("addends_str = %s" % addends_str)
-            print("result_str = '%s'" % result_str)
-            print("addends = %s" % addends)
-            print("result = %s" % result)
-            pprint(s.letters_to_letter_states)
             print("######## incorrectly determined to be not solvable")
+            print("addends_str = %s  # %s" % (addends_str, addends))
+            print("result_str = '%s'  # %s" % (result_str, result))
+            pprint(s.letters_to_letter_states)
 
 
 class SolveTest(unittest.TestCase):
-    def test_4(self):
-        addends = ["ZQ", "RF"]  # 18, 93
-        result = "ZZZ"  # 111
+    def test_6(self):
+        addends_str = ['VG', 'WG']  # [97, 27]
+        result_str = 'JWM'  # 124
 
-        s = SolutionGraph(addends, result)
+        s = SolutionGraph(addends_str, result_str)
         pprint(s.letters_to_letter_states)
+        works = s.permutation_works((2, 9), ['G', 'V'])
+        self.assertFalse(works)
+
+        s = SolutionGraph(addends_str, result_str)
         answer = s.solution()
         self.assertIsNotNone(answer)
+
+    def test_5(self):
+        addends_str = ['ZM', 'ZU']  # [29, 25]
+        result_str = 'UQ'  # 54
+
+        s = SolutionGraph(addends_str, result_str)
+        pprint(s.letters_to_letter_states)
+        works = s.permutation_works((1, 5, 9), ['U', 'Z', 'M'])
+        self.assertFalse(works)
+
+        s = SolutionGraph(addends_str, result_str)
+        answer = s.solution()
+        self.assertIsNotNone(answer)
+
+    def test_4(self):
+        addends_str = ["ZQ", "RF"]  # 18, 93
+        result_str = "ZZZ"  # 111
+
+        s = SolutionGraph(addends_str, result_str)
+        pprint(s.letters_to_letter_states)
+        works = s.permutation_works((3, 9), ['F', 'R'])
+        self.assertTrue(works)
 
     def test_3(self):
         addends = ["GD", "JS"]
