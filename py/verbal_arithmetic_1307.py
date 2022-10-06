@@ -6,7 +6,7 @@ import unittest
 from pprint import pprint
 import random
 from itertools import permutations
-
+import string
 
 def solution_1(addends, result):
     # tests 1-6 run in around 10.5 seconds total.
@@ -535,7 +535,7 @@ class SolutionGraph(object):
             permutation_is_good = False
 
         if permutation_is_good:
-            # pprint(list(zip(independent_letters, p)))
+            #print("success:  %s, %s" % (p, independent_letters))
             # pprint(self.letters_to_letter_states)
             pass
 
@@ -600,8 +600,25 @@ if __name__ == '__main__':
         s = SolutionGraph(addends_str, result_str)
         if not s.solution():
             print("######## incorrectly determined to be not solvable")
-            print("addends_str = %s  # %s" % (addends_str, addends))
-            print("result_str = '%s'  # %s" % (result_str, result))
+            print("""
+########################
+    def %(test_name)s(self):
+        addends_str = %(addends_str)s  # %(addends)s
+        result_str = %(result_str)s  # %(result)s
+
+        s = SolutionGraph(addends_str, result_str)
+        answer = s.solution()
+        self.assertIsNotNone(answer)
+        
+########################
+""" % {
+                "test_name": "test_%s" % ''.join([random.choice(string.ascii_lowercase) for _ in range(10)]),
+                "addends_str": addends_str,
+                "result_str": result_str,
+                "addends": addends,
+                "result": result
+            }
+                  )
             pprint(s.letters_to_letter_states)
 
 
