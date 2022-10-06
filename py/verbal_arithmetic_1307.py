@@ -377,7 +377,6 @@ class SolutionGraph(object):
                     elif self.letters_to_letter_states[col[2]].dependent is None:
                         self.letters_to_letter_states[col[2]].dependent = False
 
-        pprint(self.letters_to_letter_states)
         self.sanity_check()
 
     def assign_digit(self, digit, letter):
@@ -434,21 +433,6 @@ class SolutionGraph(object):
         result = [self.letters_to_letter_states[x].digit for x in list(w)]
         return int(''.join(list(map(str, result))))
 
-    def checksum(self):
-        """
-        verify a mapping.  assumes all of the letters have been mapped to digits.
-        """
-        addends = [self.decrypt_letter_string(a) for a in self.addends]
-        result = self.decrypt_letter_string(self.result)
-        print(self.addends)
-        print(self.result)
-        print(addends)
-        print(result)
-        if result == sum(addends):
-            print("######## mapping is correct")
-        else:
-            print("######## we have a bug")
-
     def permutation_works(self, p, independent_letters):
         zipp = dict(zip(independent_letters, p))
         ppiz = dict(zip(p, independent_letters))
@@ -462,8 +446,6 @@ class SolutionGraph(object):
 
         for l in independent_letters:
             self.assign_digit(zipp[l], l)
-
-        #            pprint(self.letters_to_letter_states)
 
         permutation_is_good = True
 
@@ -527,11 +509,18 @@ class SolutionGraph(object):
             if not permutation_is_good:
                 break
 
+        if permutation_is_good:
+            pprint(list(zip(independent_letters, p)))
+            pprint(self.letters_to_letter_states)
+
         return permutation_is_good
 
-    def solve(self):
+    def solution(self):
         # identify all of the independent letters.  eliminate 1 and 0 if these have already been determined.
         # this should work for > 2 addends.
+
+        # returns the decrypted numbers if a solution exists, otherwise None.  if there are multiple solutions,
+        # we'll never know.
 
         independent = dict(filter(lambda x: x[1].dependent == False, self.letters_to_letter_states.items()))
 
@@ -545,13 +534,13 @@ class SolutionGraph(object):
         for p in permutations(digits, len(independent_letters)):
 
             if self.permutation_works(p, independent_letters):
-                self.checksum()
-                return True
+                addends = [self.decrypt_letter_string(a) for a in self.addends]
+                result = self.decrypt_letter_string(self.result)
+                assert sum(addends) == result
+                return addends, result
 
             # shit, try again
             self.unwind_mapping()
-
-        return False
 
 
 if __name__ == '__main__':
@@ -566,16 +555,24 @@ if __name__ == '__main__':
 
     addends_str, result_str, addends, result = make_crypto_sum(2, 2)
     s = SolutionGraph(addends_str, result_str)
-    if not s.solve():
+    if not s.solution():
         print("addends_str = %s" % addends_str)
         print("result_str = '%s'" % result_str)
         print("addends = %s" % addends)
         print("result = %s" % result)
 
-        print("incorrectly determined to be not solvable")
+        print("######## incorrectly determined to be not solvable")
 
 
 class SolveTest(unittest.TestCase):
+    def test_3(self):
+        addends = ["GD", "JS"]
+        result = "CGH"
+
+        s = SolutionGraph(addends, result)
+        works = s.permutation_works((2, 3, 9), ['D', 'S', 'G'])
+        self.assertTrue(works)
+
     def test_2(self):
         addends = ["TQ", "CW"]  # 86, 37
         result = "NFC"  # 123
@@ -589,14 +586,14 @@ class SolveTest(unittest.TestCase):
         result = "VRS"
 
         s = SolutionGraph(addends, result)
-        self.assertTrue(s.solve())
+        self.assertIs(s.solution())
 
     def test_0(self):
         addends = ["SEND", "MORE"]
         result = "MONEY"
 
         s = SolutionGraph(addends, result)
-        self.assertTrue(s.solve())
+        self.assertIs(s.solution())
 
 
 class InitializationTest(unittest.TestCase):
