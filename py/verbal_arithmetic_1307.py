@@ -104,9 +104,10 @@ def make_crypto_sum(a1_digits, a2_digits):
     addends = [a1, a2]
     result = sum(addends)
     ttable = str.maketrans(digits, letters)
+    decoder = str.maketrans(letters, digits)
     addends_str = [x.translate(ttable) for x in list(map(str, addends))]
     result_str = str(result).translate(ttable)
-    return addends_str, result_str, addends, result
+    return addends_str, result_str, addends, result, decoder
 
 
 #
@@ -278,8 +279,6 @@ class SolutionGraph(object):
         # whether any of X, Y, Z is 1.
 
         c0 = self.columns[0]
-        if self.letters_to_letter_states[c0[0]].dependent is None:
-            self.letters_to_letter_states[c0[0]].dependent = True
 
         # now the rest of the first column.  these are the cases:
         #
@@ -293,28 +292,36 @@ class SolutionGraph(object):
                 # case 1
                 self.letters_to_letter_states[c0[0]].fixed = True
                 self.assign_digit(0, c0[0])
+                self.letters_to_letter_states[c0[1]].dependent = True
             else:
                 # case 2
                 if self.letters_to_letter_states[c0[1]].dependent is None:
                     # it's not already 1
                     self.letters_to_letter_states[c0[1]].dependent = False
+                if self.letters_to_letter_states[c0[0]].dependent is None:
+                    # it's not already 1
+                    self.letters_to_letter_states[c0[0]].dependent = True
+
         else:
             if c0[0] == c0[1]:
                 # case 3
                 self.letters_to_letter_states[c0[2]].fixed = True
                 self.letters_to_letter_states[c0[2]].dependent = True
                 self.assign_digit(0, c0[2])
-                self.letters_to_letter_states[c0[0]].dependent = False
+                if self.letters_to_letter_states[c0[0]].dependent is None:
+                    self.letters_to_letter_states[c0[0]].dependent = False
             elif c0[0] == c0[2]:
                 # also case 3
                 self.letters_to_letter_states[c0[1]].fixed = True
                 self.letters_to_letter_states[c0[1]].dependent = True
                 self.assign_digit(0, c0[1])
-                self.letters_to_letter_states[c0[0]].dependent = False
+                if self.letters_to_letter_states[c0[0]].dependent is None:
+                    self.letters_to_letter_states[c0[0]].dependent = False
             else:
                 # case 4
                 if self.letters_to_letter_states[c0[0]].digit is None:
                     # Z was not set as the leftmost 1 of the sum.  but one of x or y could be.
+                    self.letters_to_letter_states[c0[0]].dependent = True
                     if self.letters_to_letter_states[c0[1]].digit is None and self.letters_to_letter_states[
                         c0[2]].digit is None:
                         self.letters_to_letter_states[c0[1]].dependent = False
@@ -535,7 +542,7 @@ class SolutionGraph(object):
             permutation_is_good = False
 
         if permutation_is_good:
-            #print("success:  %s, %s" % (p, independent_letters))
+            # print("success:  %s, %s" % (p, independent_letters))
             # pprint(self.letters_to_letter_states)
             pass
 
@@ -596,15 +603,16 @@ if __name__ == '__main__':
     #     s = SolutionGraph(addends, result)
 
     for _ in range(100):
-        addends_str, result_str, addends, result = make_crypto_sum(2, 2)
+        addends_str, result_str, addends, result, ttable = make_crypto_sum(2, 2)
         s = SolutionGraph(addends_str, result_str)
         if not s.solution():
             print("######## incorrectly determined to be not solvable")
             print("""
 ########################
+    # python -m unittest verbal_arithmetic_1307.SolveTest.%(test_name)s
     def %(test_name)s(self):
         addends_str = %(addends_str)s  # %(addends)s
-        result_str = %(result_str)s  # %(result)s
+        result_str = '%(result_str)s'  # %(result)s
 
         s = SolutionGraph(addends_str, result_str)
         answer = s.solution()
@@ -619,10 +627,31 @@ if __name__ == '__main__':
                 "result": result
             }
                   )
+            for k, v in ttable.items():
+                print(chr(k), chr(v))
             pprint(s.letters_to_letter_states)
+            break
 
 
 class SolveTest(unittest.TestCase):
+    # python -m unittest verbal_arithmetic_1307.SolveTest.test_exhxqvuwhg
+    def test_exhxqvuwhg(self):
+        addends_str = ['GE', 'QT']  # [60, 71]
+        result_str = 'TMT'  # 131
+
+        s = SolutionGraph(addends_str, result_str)
+        answer = s.solution()
+        self.assertIsNotNone(answer)
+
+    # python -m unittest verbal_arithmetic_1307.SolveTest.test_fksztyrdsl
+    def test_fksztyrdsl(self):
+        addends_str = ['GL', 'AR']  # [40, 61]
+        result_str = 'RLR'  # 101
+
+        s = SolutionGraph(addends_str, result_str)
+        answer = s.solution()
+        self.assertIsNotNone(answer)
+
     def test_6(self):
         addends_str = ['VG', 'WG']  # [97, 27]
         result_str = 'JWM'  # 124
