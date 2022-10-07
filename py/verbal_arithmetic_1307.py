@@ -104,7 +104,7 @@ def make_crypto_sum(a1_digits, a2_digits):
     addends = [a1, a2]
     result = sum(addends)
     ttable = str.maketrans(digits, letters)
-    decoder = str.maketrans(letters, digits)
+    decoder = {chr(k): int(chr(v)) for k, v in str.maketrans(letters, digits).items()}
     addends_str = [x.translate(ttable) for x in list(map(str, addends))]
     result_str = str(result).translate(ttable)
     return addends_str, result_str, addends, result, decoder
@@ -603,37 +603,76 @@ if __name__ == '__main__':
     #     s = SolutionGraph(addends, result)
 
     for _ in range(1000):
-        addends_str, result_str, addends, result, ttable = make_crypto_sum(4, 4)
+        addends_str, result_str, addends, result, decoder = make_crypto_sum(4, 4)
         s = SolutionGraph(addends_str, result_str)
         if not s.solution():
+            random_name = ''.join([random.choice(string.ascii_lowercase) for _ in range(10)])
+            solution_test = "test_%s_solution" % random_name
+            perm_test = "test_%s_permutation" % random_name
+
+            permutation = {}
+            for letter in s.letters_to_letter_states:
+                if not s.letters_to_letter_states[letter].dependent:
+                    permutation[letter] = decoder[letter]
+
             print("######## incorrectly determined to be not solvable")
             print("""
-########################
-    # python -m unittest verbal_arithmetic_1307.SolveTest.%(test_name)s
-    def %(test_name)s(self):
+    ########################
+    # python -m unittest verbal_arithmetic_1307.SolveTest.%(perm_test)s
+    def %(perm_test)s(self):
+        addends_str = %(addends_str)s  # %(addends)s
+        result_str = '%(result_str)s'  # %(result)s
+        
+        s = SolutionGraph(addends_str, result_str)
+        works = s.permutation_works(%(permutation)s)
+        self.assertTrue(works)
+
+    # python -m unittest verbal_arithmetic_1307.SolveTest.%(solution_test)s
+    def %(solution_test)s(self):
         addends_str = %(addends_str)s  # %(addends)s
         result_str = '%(result_str)s'  # %(result)s
 
         s = SolutionGraph(addends_str, result_str)
         answer = s.solution()
         self.assertIsNotNone(answer)
-        
+
 ########################
 """ % {
-                "test_name": "test_%s" % ''.join([random.choice(string.ascii_lowercase) for _ in range(10)]),
+                "solution_test": solution_test,
+                "perm_test": perm_test,
                 "addends_str": addends_str,
                 "result_str": result_str,
                 "addends": addends,
-                "result": result
+                "result": result,
+                "permutation": permutation
             }
                   )
-            d = {chr(k): int(chr(v)) for k, v in ttable.items()}
-            pprint(d)
+            pprint(decoder)
             pprint(s.letters_to_letter_states)
+            pprint(permutation)
             break
 
 
 class SolveTest(unittest.TestCase):
+    ########################
+    # python -m unittest verbal_arithmetic_1307.SolveTest.test_fgxabreoii_permutation
+    def test_fgxabreoii_permutation(self):
+        addends_str = ['EELV', 'WOLX']  # [3346, 8041]
+        result_str = 'XXEWA'  # 11387
+
+        s = SolutionGraph(addends_str, result_str)
+        works = s.permutation_works({'O': 0, 'V': 6, 'L': 4})
+        self.assertTrue(works)
+
+    # python -m unittest verbal_arithmetic_1307.SolveTest.test_fgxabreoii_solution
+    def test_fgxabreoii_solution(self):
+        addends_str = ['EELV', 'WOLX']  # [3346, 8041]
+        result_str = 'XXEWA'  # 11387
+
+        s = SolutionGraph(addends_str, result_str)
+        answer = s.solution()
+        self.assertIsNotNone(answer)
+
     # python -m unittest verbal_arithmetic_1307.SolveTest.test_exhxqvuwhg
     def test_exhxqvuwhg(self):
         addends_str = ['GE', 'QT']  # [60, 71]
