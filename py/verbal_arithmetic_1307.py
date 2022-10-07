@@ -449,16 +449,16 @@ class SolutionGraph(object):
         return int(''.join(list(map(str, result))))
 
     def permutation_works(self, p, independent_letters):
-        zipp = dict(zip(independent_letters, p))
-        if 0 in p:
-            ppiz = dict(zip(p, independent_letters))
-            zeroletter = ppiz[0]
+        letters_to_digits = dict(zip(independent_letters, p))
+        if 0 in letters_to_digits.values():
+            digits_to_letters = dict(zip(p, independent_letters))
+            zeroletter = digits_to_letters[0]
             if not self.letters_to_letter_states[zeroletter].can_be_zero:
                 # print("%s cannot map to 0, trying another" % zeroletter)
                 return False
 
         for l in independent_letters:
-            self.assign_digit(zipp[l], l)
+            self.assign_digit(letters_to_digits[l], l)
 
         permutation_is_good = True
 
@@ -535,7 +535,7 @@ class SolutionGraph(object):
                 raise ValueError("too many unset digits in column:  %s" % col)
 
             if not permutation_is_good:
-                #print("%s:  nope" % zipp)
+                #print("%s:  nope" % letters_to_digits)
                 break
 
         if carry != 0:
@@ -602,8 +602,8 @@ if __name__ == '__main__':
     #
     #     s = SolutionGraph(addends, result)
 
-    for _ in range(100):
-        addends_str, result_str, addends, result, ttable = make_crypto_sum(2, 2)
+    for _ in range(1000):
+        addends_str, result_str, addends, result, ttable = make_crypto_sum(4, 4)
         s = SolutionGraph(addends_str, result_str)
         if not s.solution():
             print("######## incorrectly determined to be not solvable")
