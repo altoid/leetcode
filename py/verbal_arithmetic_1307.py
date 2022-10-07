@@ -448,16 +448,15 @@ class SolutionGraph(object):
         result = [self.letters_to_letter_states[x].digit for x in list(w)]
         return int(''.join(list(map(str, result))))
 
-    def permutation_works(self, p, independent_letters):
-        letters_to_digits = dict(zip(independent_letters, p))
+    def permutation_works(self, letters_to_digits):
         if 0 in letters_to_digits.values():
-            digits_to_letters = dict(zip(p, independent_letters))
+            digits_to_letters = {v:k for k, v in letters_to_digits.items()}
             zeroletter = digits_to_letters[0]
             if not self.letters_to_letter_states[zeroletter].can_be_zero:
                 # print("%s cannot map to 0, trying another" % zeroletter)
                 return False
 
-        for l in independent_letters:
+        for l in letters_to_digits.keys():
             self.assign_digit(letters_to_digits[l], l)
 
         permutation_is_good = True
@@ -568,7 +567,8 @@ class SolutionGraph(object):
                 digits.remove(self.letters_to_letter_states[k].digit)
 
         for p in permutations(digits, len(independent_letters)):
-            if self.permutation_works(p, independent_letters):
+            letters_to_digits = dict(zip(independent_letters, p))
+            if self.permutation_works(letters_to_digits):
                 addends = [self.decrypt_letter_string(a) for a in self.addends]
                 result = self.decrypt_letter_string(self.result)
                 if sum(addends) != result:
@@ -627,8 +627,8 @@ if __name__ == '__main__':
                 "result": result
             }
                   )
-            for k, v in ttable.items():
-                print(chr(k), chr(v))
+            d = {chr(k): int(chr(v)) for k, v in ttable.items()}
+            pprint(d)
             pprint(s.letters_to_letter_states)
             break
 
@@ -657,8 +657,8 @@ class SolveTest(unittest.TestCase):
         result_str = 'JWM'  # 124
 
         s = SolutionGraph(addends_str, result_str)
-        pprint(s.letters_to_letter_states)
-        works = s.permutation_works((2, 9), ['G', 'V'])
+        permutation = dict(zip(['G', 'V'], (2, 9)))
+        works = s.permutation_works(permutation)
         self.assertFalse(works)
 
         s = SolutionGraph(addends_str, result_str)
@@ -670,8 +670,8 @@ class SolveTest(unittest.TestCase):
         result_str = 'UQ'  # 54
 
         s = SolutionGraph(addends_str, result_str)
-        pprint(s.letters_to_letter_states)
-        works = s.permutation_works((1, 5, 9), ['U', 'Z', 'M'])
+        permutation = dict(zip(['U', 'Z', 'M'], (1, 5, 9)))
+        works = s.permutation_works(permutation)
         self.assertFalse(works)
 
         s = SolutionGraph(addends_str, result_str)
@@ -683,8 +683,8 @@ class SolveTest(unittest.TestCase):
         result_str = "ZZZ"  # 111
 
         s = SolutionGraph(addends_str, result_str)
-        pprint(s.letters_to_letter_states)
-        works = s.permutation_works((3, 9), ['F', 'R'])
+        permutation = dict(zip(['F', 'R'], (3, 9)))
+        works = s.permutation_works(permutation)
         self.assertTrue(works)
 
     def test_3(self):
@@ -700,7 +700,8 @@ class SolveTest(unittest.TestCase):
         result = "CGH"
 
         s = SolutionGraph(addends, result)
-        works = s.permutation_works((2, 3, 9), ['D', 'S', 'G'])
+        permutation = dict(zip(['D', 'S', 'G'], (2, 3, 9)))
+        works = s.permutation_works(permutation)
         self.assertFalse(works)
 
     def test_2(self):
@@ -708,7 +709,8 @@ class SolveTest(unittest.TestCase):
         result = "NFC"  # 123
 
         s = SolutionGraph(addends, result)
-        works = s.permutation_works((7, 8, 6), ['W', 'T', 'Q'])
+        permutation = dict(zip(['W', 'T', 'Q'], (7, 8, 6)))
+        works = s.permutation_works(permutation)
         self.assertTrue(works)
 
     def test_1(self):
