@@ -8,6 +8,7 @@ import random
 from itertools import permutations
 import string
 
+
 def solution_1(addends, result):
     # tests 1-6 run in around 10.5 seconds total.
 
@@ -450,7 +451,7 @@ class SolutionGraph(object):
 
     def permutation_works(self, letters_to_digits):
         if 0 in letters_to_digits.values():
-            digits_to_letters = {v:k for k, v in letters_to_digits.items()}
+            digits_to_letters = {v: k for k, v in letters_to_digits.items()}
             zeroletter = digits_to_letters[0]
             if not self.letters_to_letter_states[zeroletter].can_be_zero:
                 # print("%s cannot map to 0, trying another" % zeroletter)
@@ -520,7 +521,7 @@ class SolutionGraph(object):
 
                         if (missing_digit_count * k) % 10 == (
                                 self.letters_to_letter_states[sum_letter].digit - carry - self.sum_of_addends(
-                                col)) % 10:
+                            col)) % 10:
                             candidates.append(k)
                     if not candidates:
                         permutation_is_good = False
@@ -534,7 +535,7 @@ class SolutionGraph(object):
                 raise ValueError("too many unset digits in column:  %s" % col)
 
             if not permutation_is_good:
-                #print("%s:  nope" % letters_to_digits)
+                # print("%s:  nope" % letters_to_digits)
                 break
 
         if carry != 0:
@@ -560,7 +561,7 @@ class SolutionGraph(object):
         independent = dict(filter(lambda x: x[1].dependent == False, self.letters_to_letter_states.items()))
 
         independent_letters = list(independent.keys())
-        #pprint(independent_letters)
+        # pprint(independent_letters)
         digits = {x for x in range(10)}
         for k in self.letters_to_letter_states.keys():
             if self.letters_to_letter_states[k].fixed:
