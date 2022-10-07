@@ -341,9 +341,12 @@ class SolutionGraph(object):
         # next columns
         for col in self.columns[1:]:
             if self.letters_to_letter_states[col[0]].dependent is None:
-                # we haven't encountered this letter yet.  but if the first time we are seeing it is in the sum,
-                # it's definitely dependent
-                self.letters_to_letter_states[col[0]].dependent = True
+                # we haven't encountered this letter yet.  if the first time we are seeing it is
+                # in the sum, it is dependent UNLESS it also appears in the addends.
+                if col.unique_digits[col[0]] == 1:
+                    self.letters_to_letter_states[col[0]].dependent = True
+                else:
+                    self.letters_to_letter_states[col[0]].dependent = False
 
             # now look at the addend digits
 
@@ -662,6 +665,7 @@ class SolveTest(unittest.TestCase):
         result_str = 'XXEWA'  # 11387
 
         s = SolutionGraph(addends_str, result_str)
+        pprint(s.letters_to_letter_states)
         works = s.permutation_works({'O': 0, 'V': 6, 'L': 4})
         self.assertTrue(works)
 
