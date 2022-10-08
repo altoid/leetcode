@@ -738,7 +738,6 @@ class SolveTest(unittest.TestCase):
         result_str = 'XXEWA'  # 11387
 
         s = SolutionGraph(addends_str, result_str)
-        pprint(s.letters_to_letter_states)
         works = s.permutation_works({'O': 0, 'V': 6, 'L': 4})
         self.assertTrue(works)
 
@@ -783,7 +782,6 @@ class SolveTest(unittest.TestCase):
         result_str = 'JWM'  # 124
 
         s = SolutionGraph(addends_str, result_str)
-        pprint(s.letters_to_letter_states)
         answer = s.solution()
         self.assertIsNotNone(answer)
 
@@ -958,8 +956,6 @@ class InitializationTest(unittest.TestCase):
         self.assertTrue(s.letters_to_letter_states[c0[0]].dependent)
         self.assertTrue(s.letters_to_letter_states[c0[0]].can_be_zero)
         self.assertEqual(0, s.letters_to_letter_states[c0[0]].digit)
-        for x in c0:
-            pprint(s.letters_to_letter_states[x])
 
 
 class ColumnTest(unittest.TestCase):
