@@ -500,7 +500,7 @@ class SolutionGraph(object):
 
             if (missing_digit_count * k) % 10 == (
                     self.letters_to_letter_states[sum_letter].digit - carry - self.sum_of_addends(column)) % 10:
-                column_sum = self.sum_of_addends(column)
+                column_sum = self.sum_of_addends(column) + missing_digit_count * k + carry
                 new_carry = column_sum // 10
                 candidates.append((k, new_carry))
         return candidates
@@ -572,6 +572,8 @@ class SolutionGraph(object):
         if not bool(result):
             # shit, revert this permutation
             self.unwind_mapping()
+        else:
+            pass
 
         return bool(result)
 
@@ -717,16 +719,21 @@ class SolveTest(unittest.TestCase):
         answer = s.solution()
         self.assertIsNotNone(answer)
 
-    def test_6(self):
+    def test_6_permutation(self):
         addends_str = ['VG', 'WG']  # [97, 27]
         result_str = 'JWM'  # 124
 
         s = SolutionGraph(addends_str, result_str)
-        permutation = dict(zip(['G', 'V'], (2, 9)))
+        permutation = {'W': 2, 'G': 7}
         works = s.permutation_works(permutation)
-        self.assertFalse(works)
+        self.assertTrue(works)
+
+    def test_6_solution(self):
+        addends_str = ['VG', 'WG']  # [97, 27]
+        result_str = 'JWM'  # 124
 
         s = SolutionGraph(addends_str, result_str)
+        pprint(s.letters_to_letter_states)
         answer = s.solution()
         self.assertIsNotNone(answer)
 
@@ -796,42 +803,6 @@ class SolveTest(unittest.TestCase):
 
 
 class InitializationTest(unittest.TestCase):
-    def test_11(self):
-        addends = ['SCC', 'NEE']
-        result = 'LNJ'
-
-        s = SolutionGraph(addends, result)
-
-    def test_10(self):
-        addends = ['UTW', 'JJW']
-        result = 'WAUT'
-
-        s = SolutionGraph(addends, result)
-
-    def test_9(self):
-        addends = ["AQA", "DAH"]
-        result = "WWAG"
-
-        s = SolutionGraph(addends, result)
-
-    def test_8(self):
-        addends = ["BJJ", "YPJ"]
-        result = "BJPJ"
-
-        s = SolutionGraph(addends, result)
-
-    def test_7(self):
-        addends = ["UPQ", "PPQ"]
-        result = "ECTQ"
-
-        s = SolutionGraph(addends, result)
-
-    def test_6(self):
-        addends = ["OQ", "OY"]
-        result = "QX"
-
-        s = SolutionGraph(addends, result)
-
     def test_5(self):
         addends = ["HY", "CV"]
         result = "VRS"
