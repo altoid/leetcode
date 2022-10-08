@@ -210,12 +210,10 @@ class SolutionGraph(object):
         self.result = result
         self.letters_to_letter_states = {}
         self.columns = []
-        self.digits_used = {}
         self.solvable = True
 
         # maps digits to the letters that got mapped to them.
         self.digit_mapping = dict(zip(range(10), [False] * 10))
-        self.digits_used = dict(zip(range(10), [False] * 10))
 
         # print("addends = %s" % addends)
         # print("result = '%s'" % result)
@@ -394,14 +392,12 @@ class SolutionGraph(object):
         self.sanity_check()
 
     def assign_digit(self, digit, letter):
-        self.digits_used[digit] = True
         self.digit_mapping[digit] = letter
         self.letters_to_letter_states[letter].digit = digit
 
     def unassign_digit(self, digit):
         assigned_to = self.digit_mapping[digit]
         self.digit_mapping[digit] = None
-        self.digits_used[digit] = False
         self.letters_to_letter_states[assigned_to].digit = None
 
     def unmapped_letters(self, col):
@@ -469,7 +465,7 @@ class SolutionGraph(object):
                 # case 1
                 column_sum = self.sum_of_addends(column) + carry
                 new_carry, missing_digit = divmod(column_sum, 10)
-                if self.digits_used[missing_digit]:
+                if self.digit_mapping[missing_digit]:
                     # we've already used this digit, permutation is no good
                     return []
 
@@ -479,8 +475,8 @@ class SolutionGraph(object):
             # column looks like X - - X - X - -
             # try all the unused digits one by one
             candidates = []
-            for k in self.digits_used.keys():
-                if self.digits_used[k]:
+            for k in self.digit_mapping.keys():
+                if self.digit_mapping[k]:
                     continue
 
                 column_sum = self.sum_of_addends(column) + (sum_letter_count - 1) * k + carry
@@ -494,8 +490,8 @@ class SolutionGraph(object):
 
         candidates = []
         missing_digit_count = column.unique_digits[unmapped_letter]
-        for k in self.digits_used.keys():
-            if self.digits_used[k]:
+        for k in self.digit_mapping.keys():
+            if self.digit_mapping[k]:
                 continue
 
             if (missing_digit_count * k) % 10 == (
@@ -627,8 +623,8 @@ if __name__ == '__main__':
     #
     #     s = SolutionGraph(addends, result)
 
-    for _ in range(100):
-        addends_str, result_str, addends, result, decoder = make_crypto_sum(7, 7)
+    for _ in range(111):
+        addends_str, result_str, addends, result, decoder = make_crypto_sum(3, 5)
         s = SolutionGraph(addends_str, result_str)
         random_name = ''.join([random.choice(string.ascii_lowercase) for _ in range(10)])
         solution_test = "test_%s_solution" % random_name
