@@ -8,6 +8,10 @@ import random
 from itertools import permutations
 import string
 
+# consider this for generating permutations with constraints
+#
+# https://arxiv.org/pdf/1311.3813.pdf
+
 
 def solution_1(addends, result):
     # tests 1-6 run in around 10.5 seconds total.
@@ -380,13 +384,9 @@ class SolutionGraph(object):
                             col[0]].dependent
                 else:
                     # case 4
-                    if self.letters_to_letter_states[col[1]].dependent is None and self.letters_to_letter_states[
-                        col[2]].dependent is None:
+                    if self.letters_to_letter_states[col[1]].dependent is None:
                         self.letters_to_letter_states[col[1]].dependent = False
-                        self.letters_to_letter_states[col[2]].dependent = False
-                    elif self.letters_to_letter_states[col[1]].dependent is None:
-                        self.letters_to_letter_states[col[1]].dependent = False
-                    elif self.letters_to_letter_states[col[2]].dependent is None:
+                    if self.letters_to_letter_states[col[2]].dependent is None:
                         self.letters_to_letter_states[col[2]].dependent = False
 
         self.sanity_check()
