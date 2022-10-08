@@ -627,8 +627,8 @@ if __name__ == '__main__':
     #
     #     s = SolutionGraph(addends, result)
 
-    for _ in range(1000):
-        addends_str, result_str, addends, result, decoder = make_crypto_sum(2, 2)
+    for _ in range(100):
+        addends_str, result_str, addends, result, decoder = make_crypto_sum(7, 7)
         s = SolutionGraph(addends_str, result_str)
         random_name = ''.join([random.choice(string.ascii_lowercase) for _ in range(10)])
         solution_test = "test_%s_solution" % random_name
