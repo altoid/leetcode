@@ -469,6 +469,9 @@ class SolutionGraph(object):
         for col in self.columns:
             unmapped_letters = self.unmapped_letters(col)
 
+            if len(unmapped_letters) > 1:
+                raise ValueError("too many unset digits in column:  %s" % col)
+
             if len(unmapped_letters) == 0:
                 # don't have to determine a missing digit!  but see if this adds up.
                 column_sum = self.sum_of_addends(col) + carry
@@ -497,6 +500,7 @@ class SolutionGraph(object):
                         # case 3.  we have work to do
                         # column looks like X - - X - X - -
                         # try all the unused digits one by one
+                        candidates = []
                         foundit = False
                         for k in self.digits_used.keys():
                             if self.digits_used[k]:
@@ -505,10 +509,12 @@ class SolutionGraph(object):
                             column_sum = self.sum_of_addends(col) + (sum_letter_count - 1) * k + carry
                             new_carry, missing_digit = divmod(column_sum, 10)
                             if missing_digit == k:
-                                foundit = True
-                                self.assign_digit(missing_digit, sum_letter)
-                                carry = new_carry
-                                break
+                                candidates.append((new_carry, k))
+                        if len(candidates) > 1:
+                            raise ValueError("multiple winners for %s:  %s" % (unmapped_letters[0], candidates))
+                        if len(candidates) == 1:
+                            self.assign_digit(candidates[0][1], unmapped_letters[0])
+                            carry = candidates[0][0]
                         if not foundit:
                             permutation_is_good = False
                 else:
@@ -534,8 +540,6 @@ class SolutionGraph(object):
                         carry = column_sum // 10
                     else:
                         raise ValueError("multiple suitable digits for %s:  %s" % (unmapped_letters[0], candidates))
-            else:
-                raise ValueError("too many unset digits in column:  %s" % col)
 
             if not permutation_is_good:
                 # print("%s:  nope" % letters_to_digits)
@@ -543,11 +547,6 @@ class SolutionGraph(object):
 
         if carry != 0:
             permutation_is_good = False
-
-        if permutation_is_good:
-            # print("success:  %s, %s" % (p, independent_letters))
-            # pprint(self.letters_to_letter_states)
-            pass
 
         return permutation_is_good
 
