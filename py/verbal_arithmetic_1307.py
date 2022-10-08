@@ -473,7 +473,7 @@ class SolutionGraph(object):
                     # we've already used this digit, permutation is no good
                     return []
 
-                return missing_digit, new_carry
+                return [(missing_digit, new_carry)]
 
             # case 3:  unset digit is in the sum and in the addends.  we have work to do.
             # column looks like X - - X - X - -
@@ -513,15 +513,18 @@ class SolutionGraph(object):
         if len(unmapped_letters) > 1:
             raise ValueError("too many unmapped letters in column:  %s" % column)
 
+        unmapped_letter = None
         if len(unmapped_letters) == 0:
             # don't have to determine a missing digit!  but see if this adds up.
             column_sum = self.sum_of_addends(column) + carry
             carry, digit = divmod(column_sum, 10)
-            if digit != self.letters_to_letter_states[column].digit:
+            if digit != self.letters_to_letter_states[column[0]].digit:
                 return None
 
-        unmapped_letter = unmapped_letters[0]
-        candidates = self.candidate_digits(column, carry, unmapped_letter)
+            candidates = [(digit, carry)]
+        else:
+            unmapped_letter = unmapped_letters[0]
+            candidates = self.candidate_digits(column, carry, unmapped_letters[0])
 
         if len(candidates) == 0:
             return None
@@ -534,13 +537,15 @@ class SolutionGraph(object):
             if len(winners) == 0:
                 return None
             winner = winners[0]
-            self.assign_digit(unmapped_letter, winner[0])
+            if unmapped_letter:
+                self.assign_digit(unmapped_letter, winner[0])
             return winner
 
         for d, c in candidates:
-            self.assign_digit(d, unmapped_letter)
+            if unmapped_letter:
+                self.assign_digit(d, unmapped_letter)
             result_subsequent = self.resolve_columns(columns[1:], c)
-            if result_subsequent:
+            if result_subsequent is not None:
                 result = (d, c)
                 break
 
