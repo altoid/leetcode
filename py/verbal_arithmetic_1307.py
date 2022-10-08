@@ -814,8 +814,7 @@ class SolveTest(unittest.TestCase):
         result = "CGH"
 
         s = SolutionGraph(addends, result)
-        # pprint(s.letters_to_letter_states)
-        # self.assertIsNotNone(s.solution())
+        self.assertIsNotNone(s.solution())
 
     def test_3_5(self):
         addends = ["GD", "JS"]
