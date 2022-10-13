@@ -65,7 +65,7 @@ def solution(s):
     for r in result:
         rr = '.'.join(r[::-1])
         answer.add(rr)
-    return answer
+    return list(answer)
 
 
 if __name__ == '__main__':
@@ -83,8 +83,6 @@ class MyTest(unittest.TestCase):
         self.assertIsNotNone(helper("0", 1))
         self.assertIsNotNone(helper("10", 1))
         self.assertIsNotNone(helper("255", 1))
-
-        pprint(helper("11", 1))
 
     def test_level_2_1(self):
         result = helper("123", 2)
@@ -121,3 +119,16 @@ class MyTest(unittest.TestCase):
         result = set(solution("0000"))
         expecting = {"0.0.0.0"}
         self.assertEqual(expecting, result)
+
+    def test_4(self):
+        result = solution("00000")
+        self.assertEqual([], result)
+
+    def test_5(self):
+        result = solution("9999999999999")
+        self.assertEqual([], result)
+
+    def test_6(self):
+        result = set(solution("19216811"))
+        expecting = {"192.168.1.1"}
+        self.assertTrue(expecting.issubset(result))
