@@ -521,7 +521,8 @@ class SolutionGraph(object):
         else:
             unmapped_letter = unmapped_letters[0]
             candidates = self.candidate_digits(column, carry, unmapped_letters[0])
-
+        # if len(candidates) > 0:
+        #     pprint(candidates)
         if len(candidates) == 0:
             return None
 
@@ -557,7 +558,7 @@ class SolutionGraph(object):
             digits_to_letters = {v: k for k, v in letters_to_digits.items()}
             zeroletter = digits_to_letters[0]
             if not self.letters_to_letter_states[zeroletter].can_be_zero:
-                # print("%s cannot map to 0, trying another" % zeroletter)
+                print("%s cannot map to 0, trying another" % zeroletter)
                 return False
 
         for l in letters_to_digits.keys():
@@ -613,18 +614,9 @@ def solution(addends, result):
     return bool(answer)
 
 
-if __name__ == '__main__':
-    # addends = ["SEND", "MORE"]
-    # result = "MONEY"
-    # s = SolutionGraph(addends, result)
-
-    # for _ in range(10):
-    #     addends, result = make_crypto_sum(3, 3)
-    #
-    #     s = SolutionGraph(addends, result)
-
-    for _ in range(111):
-        addends_str, result_str, addends, result, decoder = make_crypto_sum(3, 5)
+def make_random_puzzles():
+    for _ in range(1):
+        addends_str, result_str, addends, result, decoder = make_crypto_sum(7, 7)
         s = SolutionGraph(addends_str, result_str)
         random_name = ''.join([random.choice(string.ascii_lowercase) for _ in range(10)])
         solution_test = "test_%s_solution" % random_name
@@ -636,7 +628,6 @@ if __name__ == '__main__':
         try:
             result = s.solution()
             if not result:
-                print("######## incorrectly determined to be not solvable")
                 print("""
     ########################
     # python -m unittest verbal_arithmetic_1307.SolveTest.%(perm_test)s
@@ -709,6 +700,14 @@ if __name__ == '__main__':
             pprint(s.letters_to_letter_states)
             pprint(permutation)
             break
+
+
+if __name__ == '__main__':
+    addends_str = ['ZNLAFDF', 'NZFAPBL']  # [3827595, 8357102]
+    result_str = 'PLPNVHDA'  # ([3827595, 8357102], 12184697)
+
+    s = SolutionGraph(addends_str, result_str)
+    answer = s.solution()
 
 
 class SolveTest(unittest.TestCase):
