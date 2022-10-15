@@ -63,6 +63,9 @@ class DinnerPlates:
         return result
 
     def popAtStack(self, index):
+        if index >= len(self.stacks):
+            return -1
+        
         if index == len(self.stacks) - 1:
             return self.pop()
 
@@ -207,3 +210,4 @@ class MyTest(unittest.TestCase):
         self.assertEqual(11, p)
         self.assertEqual(1, len(d.available_stacks))
         self.assertEqual(10, d.available_stacks[0])
+
