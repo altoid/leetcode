@@ -15,6 +15,9 @@ def solution():
 class DinnerPlates:
     # never allow the rightmost stack to become empty.  if we clear it out, remove it.
 
+    # we'll maintain indices of stacks with capacity in a heap.  for a stack with no remaining
+    # capacity, remove it from the heap.  requires O(n) scan + remove + heapify.
+
     def __init__(self, capacity):
         self.capacity = capacity
         self.stacks = []
@@ -109,6 +112,7 @@ class MyTest(unittest.TestCase):
 
     def test_pop_at_stack(self):
         # create 5 stacks.  empty out the middle 3.  then see what pop does.
+        # make sure pop correctly removes all empty rightmost stacks.
 
         d = DinnerPlates(3)
         self.assertEqual(-1, d.pop())
@@ -125,6 +129,13 @@ class MyTest(unittest.TestCase):
         for _ in range(d.capacity):
             d.popAtStack(3)
 
+        self.assertEqual(3, len(d.available_stacks))
+        self.assertEqual(1, d.available_stacks[0])
+
+        self.assertEqual(-1, d.popAtStack(1))
+        self.assertEqual(-1, d.popAtStack(2))
+        self.assertEqual(-1, d.popAtStack(3))
+
         self.assertEqual(15, d.pop())
         self.assertEqual(14, d.pop())
         self.assertEqual(13, d.pop())
@@ -137,5 +148,62 @@ class MyTest(unittest.TestCase):
         self.assertEqual(1, d.pop())
         self.assertEqual(-1, d.pop())
 
-# we'll maintain indices of stacks with capacity in a heap.  for a stack with no remaining
-# capacity, remove it from the heap.  requires O(n) scan + remove + heapify.
+        self.assertEqual(0, len(d.stacks))
+        self.assertEqual(0, len(d.available_stacks))
+
+    def test_push(self):
+        # make sure push fills holes
+
+        d = DinnerPlates(3)
+        self.assertEqual(-1, d.pop())
+
+        for i in range(1, 16):
+            d.push(i)
+
+        for _ in range(d.capacity):
+            d.popAtStack(1)
+
+        for _ in range(d.capacity):
+            d.popAtStack(2)
+
+        for _ in range(d.capacity):
+            d.popAtStack(3)
+
+        for i in range(100, 1000, 100):
+            d.push(i)
+
+        self.assertEqual(5, len(d.stacks))
+        self.assertEqual(0, len(d.available_stacks))
+
+        d.push(666)
+
+        self.assertEqual(6, len(d.stacks))
+        self.assertEqual(1, len(d.available_stacks))
+        self.assertEqual(5, d.available_stacks[0])
+
+        check = [666, 15, 14, 13, 900, 800, 700, 600, 500, 400, 300, 200, 100, 3, 2, 1]
+        for i in check:
+            self.assertEqual(i, d.pop())
+
+        self.assertEqual(-1, d.pop())
+
+    def test_capacity_1(self):
+        d = DinnerPlates(1)
+
+        for i in range(1, 21):
+            d.push(i)
+
+        self.assertEqual(20, len(d.stacks))
+        self.assertEqual(0, len(d.available_stacks))
+
+        p = d.pop()
+
+        self.assertEqual(20, p)
+        self.assertEqual(19, len(d.stacks))
+        self.assertEqual(0, len(d.available_stacks))
+
+        p = d.popAtStack(10)
+
+        self.assertEqual(11, p)
+        self.assertEqual(1, len(d.available_stacks))
+        self.assertEqual(10, d.available_stacks[0])
