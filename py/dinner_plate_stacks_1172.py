@@ -65,7 +65,7 @@ class DinnerPlates:
     def popAtStack(self, index):
         if index >= len(self.stacks):
             return -1
-        
+
         if index == len(self.stacks) - 1:
             return self.pop()
 
