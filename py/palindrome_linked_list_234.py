@@ -2,6 +2,7 @@
 
 import unittest
 
+
 # https://leetcode.com/problems/palindrome-linked-list/
 
 # solution that uses O(1) space.
@@ -45,6 +46,7 @@ def length(lst):
 
     return l
 
+
 def find_middle(lst):
     """
     for even-length return the node at position n/2.
@@ -60,6 +62,7 @@ def find_middle(lst):
 
     return p
 
+
 def is_palindrome(lst):
     m = find_middle(lst)
     rest = m.__next__
@@ -68,7 +71,7 @@ def is_palindrome(lst):
     prev = None
     curr = rest
     next = None
-    
+
     while curr:
         next = curr.__next__
         curr.next = prev
@@ -87,8 +90,8 @@ def is_palindrome(lst):
         prest = prest.__next__
 
     return True
-    
-    
+
+
 class MyTest(unittest.TestCase):
     def test_length(self):
         lst = create_list([1, 2, 3, 4, 5, 6, 7, 8])
@@ -97,37 +100,35 @@ class MyTest(unittest.TestCase):
         self.assertEqual(1, length(lst))
         lst = create_list([])
         self.assertEqual(0, length(lst))
-        
+
     def test_find_middle_even(self):
         arr = [1, 2, 3, 4, 5, 6, 7, 8]
         lst = create_list(arr)
         n = find_middle(lst)
         self.assertEqual(4, n.value)
-        
+
     def test_find_middle_odd(self):
         arr = [1, 2, 3, 4, 5, 6, 7]
         lst = create_list(arr)
         n = find_middle(lst)
         self.assertEqual(4, n.value)
-        
+
     def test_is_palindrome_even_1(self):
         arr = [1, 2, 3, 4, 5, 6, 7, 8]
         lst = create_list(arr)
         self.assertFalse(is_palindrome(lst))
-        
+
     def test_is_palindrome_odd_1(self):
         arr = [1, 2, 3, 4, 5, 6, 7]
         lst = create_list(arr)
-        self.assertFalse(is_palindrome(lst))        
-        
+        self.assertFalse(is_palindrome(lst))
+
     def test_is_palindrome_even_2(self):
         arr = [1, 2, 3, 4, 4, 3, 2, 1]
         lst = create_list(arr)
         self.assertTrue(is_palindrome(lst))
-        
+
     def test_is_palindrome_odd_2(self):
         arr = [1, 2, 3, 4, 3, 2, 1]
         lst = create_list(arr)
         self.assertTrue(is_palindrome(lst))
-
-        
