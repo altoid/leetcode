@@ -6,7 +6,7 @@ import unittest
 from pprint import pprint
 import random
 from collections import deque
-
+import pickle
 
 # Definition for a binary tree node.
 
@@ -101,22 +101,21 @@ class Codec:
             if n.right:
                 d.append(n.right)
 
-        return serialization
+        return pickle.dumps(serialization)
 
     def deserialize(self, data):
         """Decodes your encoded data to tree.
         """
 
-        if not data:
+        serialization = pickle.loads(data)
+        if not serialization:
             return None
 
-        toop = data[0]
-        root = DecoratedTreeNode()
-        root.val = toop[0]
+        toop = serialization[0]
+        root = DecoratedTreeNode(toop[0])
         root.order = toop[1]
-        for d in data[1:]:
-            node = DecoratedTreeNode()
-            node.val = d[0]
+        for d in serialization[1:]:
+            node = DecoratedTreeNode(d[0])
             node.order = d[1]
             self.insert(root, node)
 
