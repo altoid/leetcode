@@ -6,7 +6,7 @@ import unittest
 from pprint import pprint
 import random
 from collections import deque
-
+import pickle
 
 # Definition for a binary tree node.
 
@@ -24,25 +24,6 @@ class DecoratedTreeNode:
         self.order = None
         self.left = None
         self.right = None
-
-
-def make_test_tree(n):
-    # make a complete binary tree with n nodes.
-    arr = []
-    for i in range(n + 1):
-        node = TreeNode(i)
-        arr.append(node)
-
-    for i in range(1, n + 1):
-        li = 2 * i
-        ri = 2 * i + 1
-
-        if li < n + 1:
-            arr[i].left = arr[li]
-        if ri < n + 1:
-            arr[i].right = arr[ri]
-
-    return arr[1]
 
 
 class Codec:
@@ -116,31 +97,17 @@ class Codec:
             if n.right:
                 d.append(n.right)
 
-        simple_list = []
-        for t in serialization:
-            simple_list.append(str(t[0]))
-            simple_list.append(str(t[1]))
+        pkl = pickle.dumps(serialization)
 
-        return ','.join(simple_list)
+        return pkl
 
-    def deserialize(self, data):
+    def deserialize(self, pkl):
         """Decodes your encoded data to tree.
         """
 
-        if not data:
+        serialization = pickle.loads(pkl)
+        if not serialization:
             return None
-
-        nums = data.split(',')
-        nums = list(map(int, nums))
-
-        serialization = []
-        i = 0
-        while i < len(nums):
-            val = nums[i]
-            i += 1
-            order = nums[i]
-            i += 1
-            serialization.append((val, order))
 
         toop = serialization[0]
         root = DecoratedTreeNode(toop[0])
@@ -155,6 +122,25 @@ class Codec:
         return new_root
 
 
+def make_test_tree(n):
+    # make a complete binary tree with n nodes.
+    arr = []
+    for i in range(n + 1):
+        node = TreeNode(i)
+        arr.append(node)
+
+    for i in range(1, n + 1):
+        li = 2 * i
+        ri = 2 * i + 1
+
+        if li < n + 1:
+            arr[i].left = arr[li]
+        if ri < n + 1:
+            arr[i].right = arr[ri]
+
+    return arr[1]
+
+
 def solution():
     pass
 
@@ -164,29 +150,11 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
-    def test_1(self):
-        arr = [1, 7, 2, 4, 6, 8, 0]
-        root = TreeNode(arr[0])
-        codec = Codec()
-
-        for a in arr[1:]:
-            node = TreeNode(a)
-            codec.insert(root, node)
-
-        print(root.val)
-
-        result = codec.serialize(root)
-        print(result)
-
-        new_root = codec.deserialize(result)
-        print(new_root.val)
-
     def test_2(self):
         arr = []
         root = None
         codec = Codec()
         result = codec.serialize(root)
-        print(result)
 
         new_root = codec.deserialize(result)
         print(new_root)
