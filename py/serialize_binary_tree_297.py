@@ -28,8 +28,6 @@ class DecoratedTreeNode:
 
 class Codec:
 
-    # assume values are unique.  fix later if this is not correct.
-
     def insert(self, root, node):
         if not root:
             return
@@ -49,6 +47,9 @@ class Codec:
             return
 
     def clone_original(self, root):
+        """
+        root is a tree of TreeNodes.  create a clone of it with DecoratedTreeNodes.
+        """
         if root is None:
             return None
 
@@ -59,6 +60,9 @@ class Codec:
         return newnode
 
     def clone_decorated(self, root):
+        """
+        root is a tree of DecoratedTreeNodes.  create a clone of it with TreeNodes.
+        """
         if root is None:
             return None
 
@@ -69,6 +73,10 @@ class Codec:
         return newnode
 
     def decorate(self, root, initial):
+        """
+        do an inorder walk of the tree and set the value of <order> in each of the nodes.
+        this will make the tree a BST if you use order as the key.
+        """
         if not root:
             return initial
 
@@ -79,7 +87,13 @@ class Codec:
         return counter
 
     def serialize(self, root):
-        """Encodes a tree to a single string.
+        """
+        1. clone the tree at <root> but with DecoratedTreeNodes.
+        2. do an inorder walk of the tree and set the value of <order> in each of the nodes.
+           this will make the tree a BST if you use order as the key.
+        3. do a breadth-first traversal of the tree and create an array of (value, order) tuples,
+           one for each node.
+        4. serialize this array using pickle and return the byte string.
         """
 
         dtree = self.clone_original(root)
