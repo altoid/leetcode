@@ -15,7 +15,7 @@
 # | 8    | 2017-01-09 | 188       |
 # +------+------------+-----------+
 #
-# and turn it into ddl and instert statements that will create the table.
+# and turn it into ddl and insert statements that will create the table.
 # output is the ddl/insert statements that can be redirected to a file.
 
 import argparse
@@ -88,6 +88,7 @@ if __name__ == '__main__':
 
     column_names_and_types = list(zip(column_names, types))
 
+    print("create database if not exists %s;" % database)
     print("use %s;" % database)
     print()
     print("drop table if exists %s;" % table)

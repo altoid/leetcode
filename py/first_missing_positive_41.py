@@ -39,7 +39,7 @@ from pprint import pprint
 #
 # lemma
 #
-# the value we are looking for is in the range 2 .. n+1, where n is the
+# the value we are looking for is in the range [2 .. n+1], where n is the
 # size of the array.
 #
 # proof
