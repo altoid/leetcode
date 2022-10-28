@@ -8,34 +8,42 @@ import random
 
 
 def solution(s, p):
-    if len(p) > len(s):
+    width = len(p)
+    if width > len(s):
         return []
 
-    stop = len(s) - len(p) + 1
-    psorted = ''.join(sorted(list(p)))
+    stop = len(s) - width + 1
+    pdict = {}
+    for k in p:
+        if k not in pdict:
+            pdict[k] = 0
+        pdict[k] += 1
+
     result = []
+
+    sdict = {}
+    for k in s[:len(p)]:
+        if k not in sdict:
+            sdict[k] = 0
+        sdict[k] += 1
 
     x = 0
     while x < stop:
-        e = sorted(list(enumerate(s[x:x + len(p)])), key=lambda x: x[1])
-        i = 0
-        while i < len(p):
-            if psorted[i] != e[i][1]:
-                break
-            i += 1
-
-        if i == len(p):
+        if sdict == pdict:
             result.append(x)
-            x += 1
-            continue
 
-        # if the character that stopped the comparison is in p, increment by 1.  otherwise,
-        # increment to the character after it.
-        if e[i][1] in p:
-            x += 1
-        else:
-            x = x + e[i][0] + 1
+        c = s[x]
+        sdict[c] -= 1
+        if sdict[c] == 0:
+            del sdict[c]
 
+        c = s[x + width]
+        if c not in sdict:
+            sdict[c] = 0
+        sdict[c] += 1
+
+        x += 1
+        
     return result
 
 
