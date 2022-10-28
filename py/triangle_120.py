@@ -6,57 +6,72 @@ import unittest
 from pprint import pprint
 import random
 
-#
-# to find next set of indexes
-# start from right
-# find rightmost pair where values are equal
-# output
-# increment the right of the pair and set everything to the right of THAT to the same value
-# output
-# find rightmost pair where diff is 1
-# increment the left of the pair
-# output
-# start over
-
-def helper(arr, row, stack):
-    if row == len(arr):
-        result = 0
-        p = 0
-        while p < len(stack):
-            result += arr[p][stack[p]]
-            p += 1
-        yield result
-        return
-
-    for i in range(stack[row - 1], stack[row - 1] + 2):
-        stack.append(i)
-        for j in helper(arr, row + 1, stack):
-            yield j
-        stack.pop()
-
-
-def paths(arr):
-    stack = [0]
-    row = 1
-    for i in range(stack[row - 1], stack[row - 1] + 2):
-        stack.append(i)
-        for j in helper(arr, row + 1, stack):
-            yield j
-        stack.pop()
-
 
 def solution(arr):
-    if len(arr) == 1:
-        return arr[0][0]
-    return min(paths(arr))
+    # can't do it by evaluating paths; that is O(2 ** n)
+    # use memoization
+
+    n = len(arr)
+    tableau = [[None] * n for _ in range(n)]
+
+    tableau[0][0] = arr[0][0]
+
+    for r in range(1, n):
+        for c in range(r + 1):
+            predecessors = []
+            if c < r:
+                predecessors.append(tableau[r - 1][c])
+            if c > 0:
+                predecessors.append(tableau[r - 1][c - 1])
+
+            v = arr[r][c]
+            if predecessors:
+                v += min(predecessors)
+
+            tableau[r][c] = v
+
+    return min(tableau[-1])
+
+
+def solution_2():
+    arr = [0] * 44
+
+    # start out with an array of 0s.  increment the values in the array such that
+    #
+    # 1.  the difference between a value and the value to its right is at most 1.
+    # 2.  the rightmost element is never incremented.
+
+    # 0 0 0 0 0
+    # 1 0 0 0 0
+    # 1 1 0 0 0
+    # 2 1 0 0 0
+    # 1 1 1 0 0
+    #
+
+    # there are 2 ** n paths
+
+    p = 0
+    while True:
+        while p < len(arr) and arr[p] > arr[p + 1]:
+            p += 1
+        if p == len(arr) - 1:
+            break
+
+        arr[p] += 1
+        for i in range(p):
+            arr[i] = arr[p]
+
+        print(arr)
+        p = 0
 
 
 if __name__ == '__main__':
     arr = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]]
-    for x in paths(arr):
-        print(x)
-
-    print(min(paths(arr)))
+    print(solution(arr))
+    # for x in paths(arr):
+    #     print(x)
+    #
+    # print(min(paths(arr)))
 
 
 class MyTest(unittest.TestCase):
