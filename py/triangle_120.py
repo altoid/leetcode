@@ -6,16 +6,32 @@ import unittest
 from pprint import pprint
 import random
 
+#
+# to find next set of indexes
+# start from right
+# find rightmost pair where values are equal
+# output
+# increment the right of the pair and set everything to the right of THAT to the same value
+# output
+# find rightmost pair where diff is 1
+# increment the left of the pair
+# output
+# start over
 
 def helper(arr, row, stack):
     if row == len(arr):
-        yield
+        result = 0
+        p = 0
+        while p < len(stack):
+            result += arr[p][stack[p]]
+            p += 1
+        yield result
         return
 
     for i in range(stack[row - 1], stack[row - 1] + 2):
         stack.append(i)
-        for _ in helper(arr, row + 1, stack):
-            yield
+        for j in helper(arr, row + 1, stack):
+            yield j
         stack.pop()
 
 
@@ -24,28 +40,23 @@ def paths(arr):
     row = 1
     for i in range(stack[row - 1], stack[row - 1] + 2):
         stack.append(i)
-        for _ in helper(arr, row + 1, stack):
-            result = []
-            p = 0
-            while p < len(stack):
-                result.append(arr[p][stack[p]])
-                p += 1
-            yield result
+        for j in helper(arr, row + 1, stack):
+            yield j
         stack.pop()
 
 
 def solution(arr):
     if len(arr) == 1:
         return arr[0][0]
-    return min(map(sum, paths(arr)))
+    return min(paths(arr))
 
 
 if __name__ == '__main__':
-    arr = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3], [11, 22, 33, 44, 55]]
+    arr = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]]
     for x in paths(arr):
         print(x)
 
-    print(min(map(sum, paths(arr))))
+    print(min(paths(arr)))
 
 
 class MyTest(unittest.TestCase):
