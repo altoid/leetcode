@@ -32,6 +32,9 @@ def decode(enc):
 
 
 def solution(s):
+    if not s:
+        return s
+
     # encodings are lists of [char, count]
     s_enc = encode(s)
     s_rev_enc = encode(s[::-1])
@@ -42,6 +45,8 @@ def solution(s):
 
     # line them up by char.  new chars have to be added to the front of s
 
+    #print(s_enc)
+    #print(s_rev_enc)
     s_unique_chars = ''.join([x[0] for x in s_enc])
     s_rev_unique_chars = s_unique_chars[::-1]
 
@@ -54,23 +59,21 @@ def solution(s):
 
             k = 0
             if s_rev_enc[i][1] < s_enc[0][1]:
-                print("nope for i = %s" % i)
+                #print("nope for i = %s" % i)
                 continue
 
-            # l - i is the number of chars that match
-            nmatches = l - i
             k = 1
             equal_overlaps = True
-            while k < nmatches - 1:
+            while k < l - 1:
                 if s_rev_enc[i + k][1] != s_enc[k][1]:
                     equal_overlaps = False
                     break
                 k += 1
             if not equal_overlaps:
-                print("nope for i = %s" % i)
+                #print("nope for i = %s" % i)
                 continue
 
-            #print("good for %s" % i)
+            print("good for %s" % i)
             fulcrum = i
             break
 
@@ -99,3 +102,17 @@ class MyTest(unittest.TestCase):
         expecting = "dcbabcd"
         self.assertEqual(expecting, solution(s))
 
+    def test_3(self):
+        s = "abcdcba"
+        expecting = "abcdcba"
+        self.assertEqual(expecting, solution(s))
+
+    def test_4(self):
+        s = ""
+        expecting = ""
+        self.assertEqual(expecting, solution(s))
+
+    def test_5(self):
+        s = "ababbbabbaba"
+        expecting = "ababbabbbababbbabbaba"
+        self.assertEqual(expecting, solution(s))
