@@ -48,9 +48,9 @@ def solution(s):
     for i in range(len(s_rev_unique_chars)):
         l = len(s_rev_unique_chars) - i
         if s_rev_unique_chars[i:] == s_unique_chars[:l]:
-            print("-------")
-            print(s_rev_unique_chars)
-            print("%s%s" % (' ' * i, s_unique_chars))
+            #print("-------")
+            #print(s_rev_unique_chars)
+            #print("%s%s" % (' ' * i, s_unique_chars))
 
             k = 0
             if s_rev_enc[i][1] < s_enc[0][1]:
@@ -65,11 +65,12 @@ def solution(s):
                 if s_rev_enc[i + k][1] != s_enc[k][1]:
                     equal_overlaps = False
                     break
+                k += 1
             if not equal_overlaps:
                 print("nope for i = %s" % i)
                 continue
 
-            print("good for %s" % i)
+            #print("good for %s" % i)
             fulcrum = i
             break
 
@@ -89,4 +90,12 @@ if __name__ == '__main__':
 
 class MyTest(unittest.TestCase):
     def test_1(self):
-        pass
+        s = "aacecaaa"
+        expecting = "aaacecaaa"
+        self.assertEqual(expecting, solution(s))
+
+    def test_2(self):
+        s = "abcd"
+        expecting = "dcbabcd"
+        self.assertEqual(expecting, solution(s))
+
