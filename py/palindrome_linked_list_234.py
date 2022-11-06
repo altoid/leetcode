@@ -30,7 +30,7 @@ def print_list(head):
     lst = []
     while p:
         lst.append(p.value)
-        p = p.__next__
+        p = p.next
 
     slst = list(map(str, lst))
     print("<%s>" % ", ".join(slst))
@@ -42,7 +42,7 @@ def length(lst):
     p = lst
     while p:
         l += 1
-        p = p.__next__
+        p = p.next
 
     return l
 
@@ -58,14 +58,14 @@ def find_middle(lst):
 
     p = lst
     for c in range(stophere - 1):
-        p = p.__next__
+        p = p.next
 
     return p
 
 
 def is_palindrome(lst):
     m = find_middle(lst)
-    rest = m.__next__
+    rest = m.next
     m.next = None
 
     prev = None
@@ -73,7 +73,7 @@ def is_palindrome(lst):
     next = None
 
     while curr:
-        next = curr.__next__
+        next = curr.next
         curr.next = prev
         prev = curr
         curr = next
@@ -86,8 +86,8 @@ def is_palindrome(lst):
     while prest:
         if plst.value != prest.value:
             return False
-        plst = plst.__next__
-        prest = prest.__next__
+        plst = plst.next
+        prest = prest.next
 
     return True
 
@@ -132,3 +132,8 @@ class MyTest(unittest.TestCase):
         arr = [1, 2, 3, 4, 3, 2, 1]
         lst = create_list(arr)
         self.assertTrue(is_palindrome(lst))
+
+    def test_1(self):
+        arr = [1, 2]
+        lst = create_list(arr)
+        self.assertFalse(is_palindrome(lst))
