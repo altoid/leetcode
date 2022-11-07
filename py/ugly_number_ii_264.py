@@ -17,8 +17,8 @@ def solution(nth):
     val_to_powers = {}
 
     initial = (0, 0, 0)
-    v = powers_to_value(initial)
-    val_to_powers[v] = initial
+    minkey = powers_to_value(initial)
+    val_to_powers[minkey] = initial
     bucket.add(initial)
 
     #
@@ -27,8 +27,6 @@ def solution(nth):
         minkey = min(val_to_powers.keys())
         powers = val_to_powers[minkey]
 
-        #print(minkey, powers)
-
         bucket.remove(powers)
         del val_to_powers[minkey]
 
@@ -36,8 +34,6 @@ def solution(nth):
         successors = [x[:], x[:], x[:]]
         for i in range(len(successors)):
             successors[i][i] += 1
-
-        #print(successors)
 
         for s in successors:
             t = tuple(s)
@@ -52,7 +48,8 @@ def solution(nth):
 
 
 if __name__ == '__main__':
-    print(solution(1300))
+    # the 1692nd is exactly 2 ** 31!
+    print(solution(1692))
 
 
 class MyTest(unittest.TestCase):
