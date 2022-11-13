@@ -40,6 +40,8 @@ def mine(s):
         bitz[i] = bitz[i - 1] ^ masks[c]
         i += 1
 
+    pprint(list(zip(s, bitz, range(len(bitz)))))
+
     longest = 0
     first_appearance = {}
     for i in range(len(s)):
@@ -66,6 +68,21 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_17(self):
+        s = "aaaaaaaa"
+        expecting = 8
+        self.assertEqual(expecting, solution(s))
+
+    def test_16(self):
+        s = "aaaaaaa"
+        expecting = 6
+        self.assertEqual(expecting, solution(s))
+
+    def test_15(self):
+        s = "aoeuiaoeui"
+        expecting = 10
+        self.assertEqual(expecting, solution(s))
+
     def test_14(self):
         s = "aoeuixxxaoeui"
         expecting = 13
@@ -78,7 +95,7 @@ class MyTest(unittest.TestCase):
 
     def test_12(self):
         s = "xxxxaoeuxxxx"
-        expecting = 12
+        expecting = 4
         self.assertEqual(expecting, solution(s))
 
     def test_11(self):
