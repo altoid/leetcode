@@ -20,7 +20,6 @@ def mine(s):
     if not s:
         return 0
 
-    bitz = [0] * len(s)
     A = 1
     E = 2
     I = 4
@@ -34,24 +33,19 @@ def mine(s):
     masks['o'] = O
     masks['u'] = U
 
-    bitz[0] = masks[s[0]]
-    i = 1
-    for c in s[1:]:
-        bitz[i] = bitz[i - 1] ^ masks[c]
-        i += 1
-
     #pprint(list(zip(s, bitz, range(len(bitz)))))
 
     longest = 0
     first_appearance = {}
+    b = 0
     for i in range(len(s)):
-        run = 0
-        if bitz[i] == 0:
+        b ^= masks[s[i]]
+        if b == 0:
             run = i + 1
         else:
-            if bitz[i] not in first_appearance:
-                first_appearance[bitz[i]] = i
-            run = i - first_appearance[bitz[i]]
+            if b not in first_appearance:
+                first_appearance[b] = i
+            run = i - first_appearance[b]
         longest = max(longest, run)
 
     return longest
