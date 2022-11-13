@@ -45,16 +45,14 @@ def mine(s):
     longest = 0
     first_appearance = {}
     for i in range(len(s)):
-        if bitz[i] not in first_appearance:
-            first_appearance[bitz[i]] = i
-            if bitz[i] == 0:
-                longest = max(longest, i + 1)
+        run = 0
+        if bitz[i] == 0:
+            run = i + 1
         else:
-            if bitz[i] == 0:
-                run = i + 1
-            else:
-                run = i - first_appearance[bitz[i]]
-            longest = max(longest, run)
+            if bitz[i] not in first_appearance:
+                first_appearance[bitz[i]] = i
+            run = i - first_appearance[bitz[i]]
+        longest = max(longest, run)
 
     return longest
 
