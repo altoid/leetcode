@@ -16,7 +16,7 @@ import random
 import string
 
 
-def mine(s):
+def solution(s):
     if not s:
         return 0
 
@@ -49,10 +49,6 @@ def mine(s):
         longest = max(longest, run)
 
     return longest
-
-
-def solution(s):
-    return mine(s)
 
 
 if __name__ == '__main__':
