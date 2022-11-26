@@ -122,19 +122,21 @@ class MyCalendarThree:
                 # go through consecutive pairs in intersections and see what they intersect with.
                 i = 0
                 o = 0
+                current = self.intervals[overlap_range[o]]
                 new_segments = []
                 while i < len(intersections) - 1:
                     k = 0
                     segment = (intersections[i], intersections[i + 1])
+                    if segment[0] >= current[1]:
+                        if o < len(overlap_range):
+                            o += 1
+                            current = self.intervals[overlap_range[o]]
+
                     new_segments.append(segment)
                     if self.overlaps(segment, newinterval):
                         k += 1
-                    current = self.intervals[overlap_range[o]]
                     if self.overlaps(segment, current):
                         k += self.intervals_to_counts[current]
-                    elif segment[0] >= current[1]:
-                        if o < len(overlap_range):
-                            o += 1
                     if segment not in self.intervals_to_counts:
                         self.intervals_to_counts[segment] = 0
                     self.intervals_to_counts[segment] = k
@@ -143,6 +145,10 @@ class MyCalendarThree:
 
                 # replace the range of overlapped segments with the new ones
                 new_intervals = self.intervals[:overlap_range[0]] + new_segments + self.intervals[overlap_range[-1] + 1:]
+
+                # don't remove the old overlapped intervals from the dictionary.  it's messy and leaving them
+                # in won't affect the result
+
                 self.intervals = new_intervals
 
         return self.max_booking
