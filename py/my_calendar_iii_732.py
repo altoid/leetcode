@@ -25,10 +25,11 @@ class MyCalendarThree:
         intersections = [min(newinterval[0], self.intervals[overlap_range[0]][0])]
 
         if len(overlap_range) == 1:
-            p1 = min(newinterval[0], self.intervals[0][0])
-            p2 = max(newinterval[0], self.intervals[0][0])
-            p3 = min(newinterval[1], self.intervals[0][1])
-            p4 = max(newinterval[1], self.intervals[0][1])
+            r = overlap_range[0]
+            p1 = min(newinterval[0], self.intervals[r][0])
+            p2 = max(newinterval[0], self.intervals[r][0])
+            p3 = min(newinterval[1], self.intervals[r][1])
+            p4 = max(newinterval[1], self.intervals[r][1])
             if p1 > intersections[-1]:
                 intersections.append(p1)
             if p2 > intersections[-1]:
@@ -144,7 +145,8 @@ class MyCalendarThree:
                     i += 1
 
                 # replace the range of overlapped segments with the new ones
-                new_intervals = self.intervals[:overlap_range[0]] + new_segments + self.intervals[overlap_range[-1] + 1:]
+                new_intervals = self.intervals[:overlap_range[0]] + new_segments + self.intervals[
+                                                                                   overlap_range[-1] + 1:]
 
                 # don't remove the old overlapped intervals from the dictionary.  it's messy and leaving them
                 # in won't affect the result
@@ -159,6 +161,29 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_4(self):
+        mc3 = MyCalendarThree()
+
+        self.assertEqual(1, mc3.book(0, 2))
+        self.assertEqual(1, mc3.book(4, 7))
+        self.assertEqual(1, mc3.book(8, 10))
+        self.assertEqual(1, mc3.book(11, 12))
+        self.assertEqual(1, mc3.book(12, 16))
+
+        self.assertEqual(1, mc3.book(2, 4))
+
+    def test_3(self):
+        mc3 = MyCalendarThree()
+
+        self.assertEqual(1, mc3.book(0, 2))
+        self.assertEqual(1, mc3.book(4, 7))
+        self.assertEqual(1, mc3.book(8, 10))
+        self.assertEqual(1, mc3.book(11, 12))
+        self.assertEqual(1, mc3.book(12, 16))
+
+        self.assertEqual(2, mc3.book(5, 14))
+        self.assertEqual(3, mc3.book(5, 18))
+
     def test_2(self):
         mc3 = MyCalendarThree()
 
@@ -179,3 +204,35 @@ class MyTest(unittest.TestCase):
         self.assertEqual(3, mc3.book(5, 10))
         self.assertEqual(3, mc3.book(25, 55))
 
+    def test_5(self):
+        mc3 = MyCalendarThree()
+        self.assertEqual(1, mc3.book(47, 50))
+        self.assertEqual(1, mc3.book(1, 10))
+        self.assertEqual(1, mc3.book(27, 36))
+        self.assertEqual(1, mc3.book(40, 47))
+        self.assertEqual(1, mc3.book(20, 27))
+        self.assertEqual(2, mc3.book(15, 23))
+        self.assertEqual(2, mc3.book(10, 18))
+        self.assertEqual(2, mc3.book(27, 36))
+        self.assertEqual(3, mc3.book(17, 25))
+        self.assertEqual(3, mc3.book(8, 17))
+        self.assertEqual(3, mc3.book(24, 33))
+        self.assertEqual(4, mc3.book(23, 28))
+        self.assertEqual(5, mc3.book(21, 27))
+        self.assertEqual(5, mc3.book(47, 50))
+        self.assertEqual(5, mc3.book(14, 21))
+        self.assertEqual(5, mc3.book(26, 32))
+        self.assertEqual(5, mc3.book(16, 21))
+        self.assertEqual(5, mc3.book(2, 7))
+        self.assertEqual(6, mc3.book(24, 33))
+        self.assertEqual(6, mc3.book(6, 13))
+        self.assertEqual(6, mc3.book(44, 50))
+        self.assertEqual(6, mc3.book(33, 39))
+        self.assertEqual(6, mc3.book(30, 36))
+        self.assertEqual(6, mc3.book(6, 15))
+        self.assertEqual(7, mc3.book(21, 27))
+        self.assertEqual(7, mc3.book(49, 50))
+        self.assertEqual(7, mc3.book(38, 45))
+        self.assertEqual(7, mc3.book(4, 12))
+        self.assertEqual(7, mc3.book(46, 50))
+        self.assertEqual(7, mc3.book(13, 21))
