@@ -128,7 +128,7 @@ class MyCalendarThree:
                     k = 0
                     segment = (intersections[i], intersections[i + 1])
                     if segment[0] >= current[1]:
-                        if o < len(overlap_range):
+                        if o + 1 < len(overlap_range):
                             o += 1
                             current = self.intervals[overlap_range[o]]
 
