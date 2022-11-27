@@ -68,8 +68,6 @@ def solution(arr):
 
     for l in range(minlevel, maxlevel):
         result, arr = fill_level(arr, l)
-        if result == 0:
-            break
         total += result
 
     return total
@@ -80,6 +78,11 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_3(self):
+        arr = [0, 7, 1, 4, 6]
+        expecting = 7
+        self.assertEqual(expecting, solution(arr))
+
     def test_2(self):
         arr = [4, 2, 0, 3, 2, 5]
         expecting = 9
