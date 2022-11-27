@@ -13,46 +13,30 @@ import random
 
 # keep increasing levels.
 
-def next_hole_at_level(arr, level, start):
-    """
-    give me the array slice of the next slot we can fill at this level.  return None if no candidates.
-    """
-    i = start
-    while i < len(arr) and arr[i] <= level:
-        i += 1
-
-    if i == len(arr):
-        return None
-
-    # arr[i] > level
-    while i < len(arr) and arr[i] > level:
-        i += 1
-
-    if i == len(arr):
-        return None
-
-    # arr[i] == level and is to the right of something taller.
-
-    j = i
-    while j < len(arr) and arr[j] <= level:
-        j += 1
-
-    if j == len(arr):
-        return None
-
-    # are we here?  then there is some element to the left of [i] that is bigger than level, so we have a cistern.
-    return i, j
-
 
 def fill_level(arr, level):
     result = 0
 
-    slice = next_hole_at_level(arr, level, 0)
-    while slice is not None:
-        i, j = slice
-        delta = j - i
-        result += delta
-        slice = next_hole_at_level(arr, level, j)
+    # find the indices of the leftmost and rightmost values that are at least <level>.
+
+    # count the number of values in that interval that are at most <level>.
+
+    i = 0
+    while i < len(arr) and arr[i] <= level:
+        i += 1
+    if i == len(arr):
+        return 0
+
+    j = len(arr) - 1
+    while j >= 0 and arr[j] <= level:
+        j -= 1
+    if j < 0:
+        return 0
+
+    j += 1
+    for x in range(i, j):
+        if arr[x] <= level:
+            result += 1
 
     return result
 
