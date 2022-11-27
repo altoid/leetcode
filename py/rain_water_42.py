@@ -7,51 +7,28 @@ from pprint import pprint
 import random
 
 
-# idea
-# starting at level 0, traverse the array looking for 0s that are between larger values.
-# change all the 0s that are between those larger values to 1.  count the number of blocks we change.
-
-# keep increasing levels.
-
-
-def fill_level(arr, level):
-    result = 0
-
-    # find the indices of the leftmost and rightmost values that are at least <level>.
-
-    # count the number of values in that interval that are at most <level>.
-
-    i = 0
-    while i < len(arr) and arr[i] <= level:
-        i += 1
-    if i == len(arr):
-        return 0
-
-    j = len(arr) - 1
-    while j >= 0 and arr[j] <= level:
-        j -= 1
-    if j < 0:
-        return 0
-
-    j += 1
-    for x in range(i, j):
-        if arr[x] <= level:
-            result += 1
-
-    return result
-
-
 def solution(arr):
     if not arr:
         return 0
 
-    total = 0
-    minlevel = min(arr)
-    maxlevel = max(arr)
+    maxima_from_left = [arr[0]] * len(arr)
+    leftmax = maxima_from_left[0]
+    for i in range(len(arr)):
+        leftmax = max(leftmax, arr[i])
+        maxima_from_left[i] = leftmax
 
-    for l in range(minlevel, maxlevel):
-        result = fill_level(arr, l)
-        total += result
+    maxima_from_right = [arr[-1]] * len(arr)
+    rightmax = maxima_from_right[-1]
+    for i in range(-1, -(len(arr) + 1), -1):
+        rightmax = max(rightmax, arr[i])
+        maxima_from_right[i] = rightmax
+
+    #pprint(maxima_from_left)
+    #pprint(maxima_from_right)
+
+    total = 0
+    for i in range(len(arr)):
+       total += min(maxima_from_left[i], maxima_from_right[i]) - arr[i]
 
     return total
 
