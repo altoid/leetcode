@@ -16,8 +16,7 @@ def solution(arr, k):
     if len(odds) == 0:
         return 0
 
-    # calculate the distance between each of the odd numbers, or between the end of the array.  to each of these
-    # quantities, add 1.
+    # calculate the distance between each of the odd numbers, or between the end of the array.
     # first get the indices of each of the odd numbers.
     odd_number_indices = []
     for i in range(len(arr)):
