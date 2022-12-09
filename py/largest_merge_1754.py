@@ -7,11 +7,35 @@ from pprint import pprint
 import random
 
 
+def self_merge(s, t1, t2):
+    # return the merge of s with itself.  t1 and t2 are the terminating characters of each string.
+
+    b, s = max(t1, t2), min(t1, t2)
+    if not s:
+        return "%s%s" % (b, s)
+
+    # ay, az ==> azay
+    # ma, mz ==> mzma
+    # mb, ma ==> mmba
+    # abca, abcd ==> abcdabca
+    # zyxz, zyxa ==> zzyyxxza
+
+
+
+    result = ""
+
+
+    return result
+
+
 def solution(s1, s2):
     # identify the longest common prefix of each string.  then look ahead 1 char in each.
     # the biggest of these prefixes is appended to the result.
     #
     # 'a' precedes 'aa'.
+
+    pprint(s1)
+    pprint(s2)
 
     result = ""
     p1a = 0
@@ -25,19 +49,20 @@ def solution(s1, s2):
             p1 += 1
             p2 += 1
 
+        common_substring = s1[p1a:p1]
+        pprint(common_substring)
+
         if p1 < len(s1) and p2 < len(s2):
-            # if we come to a char that stops the traversal, keep moving the pointer on the "bigger" string as
-            # long as the char we are pointing to is bigger than the one in the other string.
-            if s1[p1] > s2[p2]:
-                while p1 < len(s1) and s1[p1] > s2[p2]:
-                    p1 += 1
-                result += s1[p1a:p1]
-                p1a = p1
-            elif s1[p1] < s2[p2]:
-                while p2 < len(s2) and s1[p1] < s2[p2]:
-                    p2 += 1
-                result += s2[p2a:p2]
-                p2a = p2
+            # we came to a character that stopped the traversal.  so we have common substrings (possibly 0 length)
+            # followed by different characters.
+            #
+            # divide the common substring into descending and ascending parts.  for the descending parts,
+            # add one char at a time from each.  don't add the last char of descenders.  for the ascending parts,
+            # add the ascender terminated by the bigger
+            # char, then the one terminated by the smaller char.  if the ascending parts are terminated by the
+            # same char, don't add it.
+            p1a = p1 + 1
+            p2a = p2 + 1
         elif p1 < len(s1):
             result += s1[p1a:p1 + 1]
             p1a = p1 + 1
@@ -104,5 +129,29 @@ class MyTest(unittest.TestCase):
         s1 = "uuurruuuruuuuuuuuruuuuu"
         s2 = "urrrurrrrrrrruurrrurrrurrrrruu"
         expecting = "uuuurruuuruuuuuuuuruuuuurrrurrrrrrrruurrrurrrurrrrruu"
+        self.assertEqual(expecting, solution(s1, s2))
+
+    def test_8(self):
+        s1 = "tpppprrppttppppppppappaprrpp"
+        s2 = "tpptppppppptpppprprtpp"
+        expecting = "ttpptpppprrppttppppppptpppprprtppppppppppappaprrpp"
+        self.assertEqual(expecting, solution(s1, s2))
+
+    def test_9(self):
+        s1 = "edcbabcd"
+        s2 = "edcbabcx"
+        expecting = "eeddccbbabcxabcd"
+        self.assertEqual(expecting, solution(s1, s2))
+
+    def test_10(self):
+        s1 = "edcbab"
+        s2 = "edcbax"
+        expecting = "eeddccbbaxab"
+        self.assertEqual(expecting, solution(s1, s2))
+
+    def test_11(self):
+        s1 = "abcde"
+        s2 = "abcdx"
+        expecting = "abcdxabcde"
         self.assertEqual(expecting, solution(s1, s2))
 
