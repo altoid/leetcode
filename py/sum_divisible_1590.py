@@ -50,27 +50,30 @@ def solution(nums, p):
         if s not in partial_sums_to_i:
             partial_sums_to_i[s] = []
         partial_sums_to_i[s].append(i)
-    pprint("partial_sums_to_i = %s" % partial_sums_to_i)
+    print("partial_sums_to_i")
+    pprint(partial_sums_to_i)
 
     sums_to_complements = dict(zip(sums, diffs))
-    pprint("sums_to_complements = %s" % sums_to_complements)
-
+    print("sums_to_complements")
+    pprint(sums_to_complements)
     result = len(nums) + 1
 
     for i in range(len(sums)):
         s = sums[i]
+
         s_complement = sums_to_complements[s]
-        if s_complement not in partial_sums_to_i:
+        if s_complement in partial_sums_to_i:
+            candidates = partial_sums_to_i[s_complement][::-1]
+            for c in candidates:
+                if i - c < 0:
+                    continue
+                result = min(result, i - c)
+                break
+        if s == r:
+            result = min(result, i + 1)
             continue
 
-        candidates = partial_sums_to_i[s_complement][::-1]
-        for c in candidates:
-            if i - c < 0:
-                continue
-            result = min(result, i - c)
-            break
-
-    if result > len(nums):
+    if result >= len(nums):
         return -1
     return result
 
@@ -80,6 +83,12 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_4(self):
+        nums = [4,4,2]
+        p = 7
+        expecting = -1
+        self.assertEqual(expecting, solution(nums, p))
+
     def test_3(self):
         nums = [8,32,31,18,34,20,21,13,1,27,23,22,11,15,30,4,2]
         p = 148
