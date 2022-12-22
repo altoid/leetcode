@@ -24,16 +24,25 @@ def solution(nums, k):
 
     result = 0
 
-    pprint(prefix_sum_to_i)
-    pprint(prefix_sums)
-    for i in range(len(prefix_sums)):
-        inv = additive_inverses[prefix_sums[i]]
-        if inv in prefix_sum_to_i:
-            candidates = prefix_sum_to_i[inv]
-            candidates = list(filter(lambda x: x < i, candidates))
-            result += len(candidates)
-        if prefix_sums[i] == k:
-            result += 1
+    #pprint(prefix_sum_to_i)
+    #pprint(prefix_sums)
+    #pprint(additive_inverses)
+
+    if k == 0:
+        for k, v in prefix_sum_to_i.items():
+            n = len(v)
+            result += (n * (n - 1)) // 2
+            if k == 0:
+                result += n
+    else:
+        for i in range(len(prefix_sums)):
+            inv = additive_inverses[prefix_sums[i]]
+            if inv in prefix_sum_to_i:
+                candidates = prefix_sum_to_i[inv]
+                candidates = list(filter(lambda x: x < i, candidates))
+                result += len(candidates)
+            if prefix_sums[i] == k:
+                result += 1
 
     return result
 
