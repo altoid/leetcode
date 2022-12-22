@@ -16,12 +16,10 @@ def solution(nums, k):
     suffixes = []
     partial_sum = 0
     current_suffix = total
-    prefix_to_i = {}
     suffix_to_i = {}
     i = 0
     for n in nums:
         partial_sum += n
-        prefix_to_i[partial_sum] = i
         prefixes.append(partial_sum)
 
         suffixes.append(current_suffix)
@@ -68,6 +66,12 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_4(self):
+        nums = [3, 2, 20, 1, 1, 3]
+        k = 100
+        expecting = -1
+        self.assertEqual(expecting, solution(nums, k))
+
     def test_3(self):
         nums = [3, 2, 20, 1, 1, 3]
         k = 10
