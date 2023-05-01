@@ -15,9 +15,15 @@ def solution(s, t, combo):
         return True
 
     if len(s) == 0:
+        if t[0] != combo[0]:
+            return False
+
         return solution(s, t[1:], combo[1:])
 
     if len(t) == 0:
+        if s[0] != combo[0]:
+            return False
+
         return solution(s[1:], t, combo[1:])
 
     if s[0] == t[0]:
@@ -33,7 +39,10 @@ def solution(s, t, combo):
     if s[0] == combo[0]:
         return solution(s[1:], t, combo[1:])
 
-    return solution(s, t[1:], combo[1:])
+    if t[0] == combo[0]:
+        return solution(s, t[1:], combo[1:])
+
+    return False
 
 
 if __name__ == '__main__':
@@ -60,5 +69,12 @@ class MyTest(unittest.TestCase):
         s2 = ""
         s3 = ""
         expecting = True
+        self.assertEqual(expecting, solution(s1, s2, s3))
+
+    def test_4(self):
+        s1 = "a"
+        s2 = ""
+        s3 = "c"
+        expecting = False
         self.assertEqual(expecting, solution(s1, s2, s3))
 
