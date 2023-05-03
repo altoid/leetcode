@@ -24,30 +24,21 @@ import random
 
 
 def solution(s):
-    n = len(s) + 1
-    windows_0 = [0] * n
-
     zeroes_count = 0
     for c in s:
         if c == '0':
             zeroes_count += 1
 
-    windows_1 = [zeroes_count] * n
-
     ones_to_flip = 0
-    for i in range(len(s)):
-        if s[i] == '1':
+    min_flips = zeroes_count
+    for c in s:
+        if c == '1':
             ones_to_flip += 1
-        windows_0[i + 1] = ones_to_flip
-
-    for i in range(len(s)):
-        if s[i] == '0':
+        else:
             zeroes_count -= 1
-        windows_1[i + 1] = zeroes_count
+        min_flips = min(min_flips, ones_to_flip + zeroes_count)
 
-    sums = list(map(lambda x, y: x + y, windows_0, windows_1))
-
-    return min(sums)
+    return min_flips
 
 
 if __name__ == '__main__':
