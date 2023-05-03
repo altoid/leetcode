@@ -42,10 +42,6 @@ def solution(s):
 
     sums = list(map(lambda x, y: x + y, windows_0, windows_1))
 
-    # print(windows_0)
-    # print(windows_1)
-    # print(sums)
-
     return min(sums)
 
 
