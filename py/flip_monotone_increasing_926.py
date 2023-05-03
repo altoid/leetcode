@@ -24,10 +24,7 @@ import random
 
 
 def solution(s):
-    zeroes_count = 0
-    for c in s:
-        if c == '0':
-            zeroes_count += 1
+    zeroes_count = s.count('0')
 
     ones_to_flip = 0
     min_flips = zeroes_count
