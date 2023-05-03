@@ -26,7 +26,13 @@ import random
 def solution(s):
     n = len(s) + 1
     windows_0 = [0] * n
-    windows_1 = [0] * n
+
+    zeroes_count = 0
+    for c in s:
+        if c == '0':
+            zeroes_count += 1
+
+    windows_1 = [zeroes_count] * n
 
     ones_to_flip = 0
     for i in range(len(s)):
@@ -34,11 +40,10 @@ def solution(s):
             ones_to_flip += 1
         windows_0[i + 1] = ones_to_flip
 
-    zeroes_to_flip = 0
-    for i in range(1, n):
-        if s[-i] == '0':
-            zeroes_to_flip += 1
-        windows_1[-(i + 1)] = zeroes_to_flip
+    for i in range(len(s)):
+        if s[i] == '0':
+            zeroes_count -= 1
+        windows_1[i + 1] = zeroes_count
 
     sums = list(map(lambda x, y: x + y, windows_0, windows_1))
 
@@ -63,5 +68,20 @@ class MyTest(unittest.TestCase):
     def test_3(self):
         s = '00011000'
         expecting = 2
+        self.assertEqual(expecting, solution(s))
+
+    def test_4(self):
+        s = '111110'
+        expecting = 1
+        self.assertEqual(expecting, solution(s))
+
+    def test_5(self):
+        s = '00000'
+        expecting = 0
+        self.assertEqual(expecting, solution(s))
+
+    def test_6(self):
+        s = '11111'
+        expecting = 0
         self.assertEqual(expecting, solution(s))
 
