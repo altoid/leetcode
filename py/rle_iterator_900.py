@@ -14,6 +14,24 @@ class RLEIterator(object):
         self.position_in_current_run = 0  # positions start from 1
         self.still_mo = bool(self.encoding)
 
+    def point_to_next_run(self):
+        """
+        set the pointer to the beginning of the next nontrivial run.  sets still_mo to False if doing so runs off
+        the end of the encoding.  returns the number of places the pointer was moved, or -1 if we couldn't move it.
+        """
+        advance = self.encoding[self.current_run] - self.position_in_current_run + 1
+        self.current_run += 2
+        while self.current_run < len(self.encoding) and self.encoding[self.current_run] == 0:
+            self.current_run += 2
+
+        if self.current_run >= len(self.encoding):
+            self.still_mo = False
+            return -1
+
+        self.position_in_current_run = 1
+
+        return advance
+
     def next(self, n):
 
         # cases:
@@ -34,6 +52,14 @@ class RLEIterator(object):
             return self.encoding[self.current_run + 1]
 
         # case 2:
+
+        # advance the pointer to the beginning of the next run.
+        advance = self.point_to_next_run()
+        if advance < 0:
+            return -1
+
+        n -= advance
+
         while self.still_mo and n - self.encoding[self.current_run] > 0:
             n -= self.encoding[self.current_run]
             self.current_run += 2
@@ -43,7 +69,7 @@ class RLEIterator(object):
         if not self.still_mo:
             return -1
 
-        self.position_in_current_run = n
+        self.position_in_current_run += n
         return self.encoding[self.current_run + 1]
 
 
@@ -59,10 +85,10 @@ class MyTest(unittest.TestCase):
     def test_1(self):
         encoding = [3, 'a', 3, 'b', 0, '#', 3, 'c']
         obj = RLEIterator(encoding)
-        result = obj.next(4)
+        result = obj.next(2)
         while result != -1:
             print(result)
-            result = obj.next(4)
+            result = obj.next(2)
 
         # a a a b b b c c c
         #       ^       ^       ^
