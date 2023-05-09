@@ -108,3 +108,11 @@ class MyTest(unittest.TestCase):
         while result != -1:
             print(result)
             result = obj.next(10)
+
+    def test_4(self):
+        encoding = [1, 'a', 0, '!', 0, '@', 0, '+', 1, 'b']
+        obj = RLEIterator(encoding)
+        result = obj.next(1)
+        while result != -1:
+            print(result)
+            result = obj.next(1)
