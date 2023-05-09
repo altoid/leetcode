@@ -12,35 +12,36 @@ class RLEIterator(object):
         self.encoding = encoding
         self.current_run = 0
         self.position_in_current_run = 0  # positions start from 1
-        self.no_mo = False
+        self.still_mo = bool(self.encoding)
 
     def next(self, n):
-        if self.current_run >= len(self.encoding):
+
+        # cases:
+        #
+        # 1.  incrementing the pointer keeps us in the current run
+        # 2.  or puts us into a new run
+        # 2a. possibly skipping 1 or more whole runs along the way
+        # 3.  incrementing the pointer runs us off the end of the whole encoding
+        #     and we have to return -1 for this and future next() invocations.
+
+        # degenerate cases:
+        if not self.still_mo:
             return -1
 
-        if self.no_mo:
-            return -1
+        # case 1:
+        if self.position_in_current_run + n <= self.encoding[self.current_run]:
+            self.position_in_current_run += n
+            return self.encoding[self.current_run + 1]
 
-        # deal with n == 0 later
-
-        run_remaining = self.encoding[self.current_run] - self.position_in_current_run
-
-        advance = min(run_remaining, n)
-
-        if n > run_remaining:
-            n -= run_remaining
+        # case 2:
+        while self.still_mo and n - self.encoding[self.current_run] > 0:
+            n -= self.encoding[self.current_run]
             self.current_run += 2
             if self.current_run >= len(self.encoding):
-                self.no_mo = True
-                return -1
+                self.still_mo = False
 
-            while n - self.encoding[self.current_run] >= 0:
-                n -= self.encoding[self.current_run]
-                self.current_run += 2
-        else:
-            # we're staying in this run and not advancing self.current_run
-
-            pass
+        if not self.still_mo:
+            return -1
 
         self.position_in_current_run = n
         return self.encoding[self.current_run + 1]
@@ -73,3 +74,11 @@ class MyTest(unittest.TestCase):
         while result != -1:
             print(result)
             result = obj.next(1)
+
+    def test_3(self):
+        encoding = [1, 'a', 5, 'b', 0, '#', 4, 'c']
+        obj = RLEIterator(encoding)
+        result = obj.next(10)
+        while result != -1:
+            print(result)
+            result = obj.next(10)
