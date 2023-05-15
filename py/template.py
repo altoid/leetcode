@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# url for problem here
-
 import unittest
 from pprint import pprint
 import random
