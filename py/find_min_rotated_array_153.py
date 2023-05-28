@@ -23,7 +23,7 @@ def helper(arr, a, b):
     # if a == b, then m == a == b
     # if a + 1 == b, then m = (a + b) // 2 == (a + a + 1) // 2 == (2a + 1) // 2 == a and m + 1 == b
 
-    return arr[m + 1]
+    return min(arr[m + 1], arr[0])
 
 
 def solution(arr):
@@ -50,6 +50,12 @@ class MyTest(unittest.TestCase):
     def test_3(self):
         nums = [3]
         expected = 3
+        actual = solution(nums)
+        self.assertEqual(expected, actual)
+
+    def test_4(self):
+        nums = [1, 2, 3, 4, 5]
+        expected = 1
         actual = solution(nums)
         self.assertEqual(expected, actual)
 
