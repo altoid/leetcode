@@ -63,8 +63,13 @@ def split_text(text, width):
     return result
 
 
-def solution():
-    pass
+def solution(words, width):
+    lines = split_text(words, width)
+    result = []
+    for l in lines:
+        jline = full_justify(l, width)
+        result.append(jline)
+    return result
 
 
 if __name__ == '__main__':
@@ -72,6 +77,28 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_13(self):
+        words = ["This", "is", "an", "example", "of", "text", "justification."]
+        width = 16
+        expecting = [
+            "This    is    an",
+            "example  of text",
+            "justification.  "
+        ]
+        result = solution(words, width)
+        self.assertEqual(expecting, result)
+
+    def test_12(self):
+        words = ["This", "is", "an", "example", "of", "text", "justification."]
+        width = 16
+        expecting = [
+            ["This", "is", "an"],
+            ["example", "of", "text"],
+            ["justification."]
+        ]
+        result = split_text(words, width)
+        self.assertEqual(expecting, result)
+
     def test_11(self):
         words = ["This", "is", "an", "example", "of", "text", "justification."]
         width = 16
