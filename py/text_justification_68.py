@@ -13,11 +13,11 @@ def left_justify(words, width):
 
 
 def full_justify(words, width):
+    if len(words) == 1:
+        return left_justify(words, width)
+
     min_width = sum(map(len, words))
     spaces_needed = width - min_width
-    if len(words) == 1:
-        padding = ' ' * (width - len(words[0]))
-        return words[0] + padding
 
     q, r = divmod(spaces_needed, len(words) - 1)
     padding = []
@@ -80,5 +80,20 @@ class MyTest(unittest.TestCase):
         words = ['what', 'hath', 'god', 'wrought']
         expecting = 'what  hath god wrought'
         result = full_justify(words, 22)
+        self.assertEqual(expecting, result)
+
+    def test_7(self):
+        word = 'tintinnabulation'
+        words = [word]
+        expecting = word
+        result = full_justify(words, len(word))
+        self.assertEqual(expecting, result)
+
+    def test_8(self):
+        word = 'tintinnabulation'
+        padding = 5
+        words = [word]
+        expecting = word + ' ' * padding
+        result = full_justify(words, len(word) + padding)
         self.assertEqual(expecting, result)
 
