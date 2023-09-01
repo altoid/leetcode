@@ -34,6 +34,35 @@ def full_justify(words, width):
     return line
 
 
+def next_line(pos, text, width):
+    i = pos + 1
+    line = [text[pos]]
+    linewidth = len(text[pos])
+    while True:
+        if i >= len(text):
+            return line, None
+
+        if linewidth + 1 + len(text[i]) > width:
+            return line, i
+
+        line.append(text[i])
+        linewidth += 1 + len(text[i])
+
+        i += 1
+
+
+def split_text(text, width):
+    result = []
+    pos = 0
+    line, pos = next_line(pos, text, width)
+    while pos is not None:
+        result.append(line)
+        line, pos = next_line(pos, text, width)
+    result.append(line)
+
+    return result
+
+
 def solution():
     pass
 
@@ -43,6 +72,30 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_11(self):
+        words = ["This", "is", "an", "example", "of", "text", "justification."]
+        width = 16
+        expecting = ["justification."]
+        line, pos = next_line(6, words, width)
+        self.assertIsNone(pos)
+        self.assertEqual(expecting, line)
+
+    def test_10(self):
+        words = ["This", "is", "an", "example", "of", "text", "justification."]
+        width = 16
+        expecting = ["example", "of", "text"]
+        line, pos = next_line(3, words, width)
+        self.assertEqual(6, pos)
+        self.assertEqual(expecting, line)
+
+    def test_9(self):
+        words = ["This", "is", "an", "example", "of", "text", "justification."]
+        width = 16
+        expecting = ["This", "is", "an"]
+        line, pos = next_line(0, words, width)
+        self.assertEqual(3, pos)
+        self.assertEqual(expecting, line)
+
     def test_1(self):
         words = ['what', 'hath', 'god', 'wrought']
         expecting = 'what hath god wrought'
