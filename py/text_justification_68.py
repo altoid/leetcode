@@ -66,9 +66,12 @@ def split_text(text, width):
 def solution(words, width):
     lines = split_text(words, width)
     result = []
-    for l in lines:
-        jline = full_justify(l, width)
+    for i in range(len(lines) - 1):
+        jline = full_justify(lines[i], width)
         result.append(jline)
+    jline = left_justify(lines[-1], width)
+    result.append(jline)
+
     return result
 
 
