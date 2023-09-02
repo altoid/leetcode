@@ -47,8 +47,8 @@ from pprint import pprint
 #     suppose that the actual answer is n+2.  that would mean that the array
 #     has all the values 1 .. n+1 inclusive.  but there are just n values in
 #     the array.  therefore the array cannot have all the values in the
-#     range 1 .. n+1 and one of those values is not present.  so it must be
-#     that the missing number is in the range 1 .. n+1.  QED
+#     range 1 .. n+1 and one of those values is not present.  but we know that
+#     1 is present.  so it must be that the missing number is in the range 2 .. n+1.  QED
 #
 # does changing each value > n to mr change the answer?
 # if we didn't do this, would the answer be > mr?
@@ -122,7 +122,7 @@ def solution(arr):
         terminus = arr[origin - 1]  # what position i maps to in the array
         while arr[terminus - 1] != 0:
             origin = terminus
-            terminus = arr[terminus - 1]
+            terminus = arr[origin - 1]
 
             # once we know that this array position is mapped to, we can clear it.
             arr[origin - 1] = 0
@@ -151,6 +151,10 @@ if __name__ == '__main__':
 class MyTest(unittest.TestCase):
     def setUp(self) -> None:
         self.s = Solution()
+
+    def test_13(self):
+        arr = [11, 9, 7, 5, 3, 1, -1, -3, -5]
+        self.assertEqual(2, solution(arr))
 
     def test_12(self):
         arr = [-1, -2, -60, 40, 43]
