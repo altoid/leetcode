@@ -7,7 +7,7 @@
 # Find the median of the two sorted arrays. The overall run time
 # complexity should be O(log (m+n)).
 
-from __future__ import division
+
 
 import unittest
 import random
@@ -51,7 +51,7 @@ def adjust(a, partition_a, median_a, b, partition_b, median_b):
         if new_part_b is None:
             # oh, boy.  if we can't locate this value then the partition is already 0.  instead
             # we have to move partition_a to the right by half the length of b.
-            print "######################################"
+            print("######################################")
             new_part_a = partition_a + len(b) // 2
             return new_part_a, new_part_b
 
@@ -87,7 +87,7 @@ def find_median(arr1, arr2):
     left_size = partition_a + partition_b + 2
     right_size = len(a) + len(b) - left_size
 
-    print "left_size = %s, right_size = %s" % (left_size, right_size)
+    print("left_size = %s, right_size = %s" % (left_size, right_size))
 
     # if the array with the larger median is odd length, subtract 1 from the partition
     if median_b > median_a:
@@ -97,10 +97,10 @@ def find_median(arr1, arr2):
         if parity_len_a == 1 and right_size - left_size > 1:
             partition_a -= 1
 
-    print array_as_str(sorted(a + b))
+    print(array_as_str(sorted(a + b)))
 
-    print array_as_str(a, partition=partition_a)
-    print array_as_str(b, partition=partition_b)
+    print(array_as_str(a, partition=partition_a))
+    print(array_as_str(b, partition=partition_b))
 
     left_max = max(a[partition_a], b[partition_b])
     right_min = min(a[partition_a + 1], b[partition_b + 1])
@@ -108,8 +108,8 @@ def find_median(arr1, arr2):
     while left_max > right_min:
         partition_a, partition_b = adjust(a, partition_a, median_a, b, partition_b, median_b)
 
-        print array_as_str(a, partition=partition_a)
-        print array_as_str(b, partition=partition_b)
+        print(array_as_str(a, partition=partition_a))
+        print(array_as_str(b, partition=partition_b))
 
         left_max = max(a[partition_a], b[partition_b])
         right_min = min(a[partition_a + 1], b[partition_b + 1])
@@ -124,30 +124,30 @@ def find_median(arr1, arr2):
 
 def generate_array():
     length = random.randint(2, 15)
-    return sorted([random.randint(10, 40) for _ in xrange(length)])
+    return sorted([random.randint(10, 40) for _ in range(length)])
 
 
 def print_test_case():
-    a = map(str, generate_array())
-    b = map(str, generate_array())
-    print ' '.join(a)
-    print ' '.join(b)
-    print ' '.join(sorted(a + b))
+    a = list(map(str, generate_array()))
+    b = list(map(str, generate_array()))
+    print(' '.join(a))
+    print(' '.join(b))
+    print(' '.join(sorted(a + b)))
 
 
 if __name__ == '__main__':
     a = generate_array()
     b = generate_array()
-    print "a = %s" % a
-    print "b = %s" % b
-    print "a = %s" % array_as_str(a)
-    print "b = %s" % array_as_str(b)
-    print "combo = %s" % array_as_str(sorted(a + b))
+    print("a = %s" % a)
+    print("b = %s" % b)
+    print("a = %s" % array_as_str(a))
+    print("b = %s" % array_as_str(b))
+    print("combo = %s" % array_as_str(sorted(a + b)))
 
     result = find_median(a, b)
     compare = true_median(a, b)
-    print "found median = %s" % result
-    print "true median = %s" % compare
+    print("found median = %s" % result)
+    print("true median = %s" % compare)
 
 
 class TestMedian(unittest.TestCase):
@@ -186,12 +186,12 @@ class TestMedian(unittest.TestCase):
         b = [10, 11, 21, 22, 23, 23, 26, 28, 30, 31, 34, 35, 37, 39, 39]
         self.assertEqual(true_median(a, b), find_median(a, b))
 
-    def test_median_5(self):
+    def test_median_6(self):
         a = [11, 11, 12, 12, 18, 22, 27, 30, 32, 33, 34, 36]
         b = [11, 15, 28, 39, 40]
         self.assertEqual(true_median(a, b), find_median(a, b))
 
-    def test_median_6(self):
+    def test_median_7(self):
         a = [10, 24, 30, 33]
         b = [15, 19, 19, 24, 33, 33, 36, 39, 40]
         self.assertEqual(true_median(a, b), find_median(a, b))
