@@ -10,6 +10,7 @@ import sys
 import unittest
 import random
 
+
 def simple_median(a):
     len_a = len(a)
     m = len_a // 2
@@ -96,7 +97,7 @@ def find_median(arr1, arr2):
 
         assert 0 <= a_left <= len(a)
         assert 0 <= b_left <= len(b)
-        
+
 
 def generate_array():
     length = random.randint(1, 15)
@@ -156,6 +157,21 @@ class TestPartition(unittest.TestCase):
 
 
 class TestMedian(unittest.TestCase):
+    def test_median_10(self):
+        a = [35, 36]
+        b = [13, 15, 17, 18, 21]
+        self.assertEqual(true_median(a, b), find_median(a, b))
+
+    def test_median_9(self):
+        a = [5]
+        b = [1]
+        self.assertEqual(true_median(a, b), find_median(a, b))
+
+    def test_median_8(self):
+        a = [1]
+        b = [5]
+        self.assertEqual(true_median(a, b), find_median(a, b))
+
     def test_median_1(self):
         a = [14, 16, 20, 21, 27, 29, 37, 38]
         b = [13, 17, 21, 22, 23, 29, 31, 31, 32, 35, 35]
