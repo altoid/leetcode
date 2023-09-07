@@ -11,6 +11,15 @@ import unittest
 import random
 
 
+def array_as_str(a, **kwargs):
+    p = kwargs.get('partition')
+    if p is not None:
+        p += 1
+        return "%s | %s [%s]" % (' '.join(map(str, a[:p])), ' '.join(map(str, a[p:])), simple_median(a))
+
+    return '%s [%s]' % (' '.join(map(str, a)), simple_median(a))
+
+
 def simple_median(a):
     len_a = len(a)
     m = len_a // 2
@@ -21,15 +30,6 @@ def simple_median(a):
 
 def true_median(a, b):
     return simple_median(sorted(a + b))
-
-
-def array_as_str(a, **kwargs):
-    p = kwargs.get('partition')
-    if p is not None:
-        p += 1
-        return "%s | %s [%s]" % (' '.join(map(str, a[:p])), ' '.join(map(str, a[p:])), simple_median(a))
-
-    return '%s [%s]' % (' '.join(map(str, a)), simple_median(a))
 
 
 def partition(a, b):
@@ -54,6 +54,9 @@ def find_median(arr1, arr2):
     b = arr2
     if len(arr2) < len(arr1):
         a, b = b, a
+
+    if len(a) == 0:
+        return simple_median(b)
 
     is_even = (len(a) + len(b)) % 2 == 0
     a_left, b_left = partition(a, b)
@@ -100,29 +103,25 @@ def find_median(arr1, arr2):
 
 
 def generate_array():
-    length = random.randint(1, 15)
+    length = random.randint(1, 1000)
     return sorted([random.randint(10, 40) for _ in range(length)])
 
 
-def print_test_case():
-    a = list(map(str, generate_array()))
-    b = list(map(str, generate_array()))
-    print(' '.join(a))
-    print(' '.join(b))
-    print(' '.join(sorted(a + b)))
-
-
 if __name__ == '__main__':
-    a = generate_array()
-    b = generate_array()
-    print("a = %s" % a)
-    print("b = %s" % b)
-    print("a = %s" % array_as_str(a))
-    print("b = %s" % array_as_str(b))
-    print("combo = %s" % array_as_str(sorted(a + b)))
-
-    compare = true_median(a, b)
-    print("true median = %s" % compare)
+    while True:
+        a = generate_array()
+        b = generate_array()
+        # print("a = %s" % a)
+        # print("b = %s" % b)
+        # print("a = %s" % array_as_str(a))
+        # print("b = %s" % array_as_str(b))
+        # print("combo = %s" % array_as_str(sorted(a + b)))
+        #
+        compare = true_median(a, b)
+        # print("true median = %s" % compare)
+        test = find_median(a, b)
+        # print("exp median = %s" % test)
+        assert compare == test
 
 
 class TestPartition(unittest.TestCase):
@@ -157,6 +156,11 @@ class TestPartition(unittest.TestCase):
 
 
 class TestMedian(unittest.TestCase):
+    def test_median_11(self):
+        a = [35]
+        b = []
+        self.assertEqual(true_median(a, b), find_median(a, b))
+
     def test_median_10(self):
         a = [35, 36]
         b = [13, 15, 17, 18, 21]
