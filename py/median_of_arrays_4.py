@@ -6,8 +6,7 @@
 
 # Find the median of the two sorted arrays. The overall run time
 # complexity should be O(log (m+n)).
-
-
+import sys
 import unittest
 import random
 
@@ -55,6 +54,49 @@ def find_median(arr1, arr2):
     if len(arr2) < len(arr1):
         a, b = b, a
 
+    is_even = (len(a) + len(b)) % 2 == 0
+    a_left, b_left = partition(a, b)
+
+    while True:
+        if a_left == 0:
+            a_left_max = -sys.maxsize
+            a_right_min = a[0]
+        elif a_left == len(a):
+            a_left_max = a[-1]
+            a_right_min = sys.maxsize
+        else:
+            a_left_max = a[a_left - 1]
+            a_right_min = a[a_left]
+
+        if b_left == 0:
+            b_left_max = -sys.maxsize
+            b_right_min = b[0]
+        elif b_left == len(b):
+            b_left_max = b[-1]
+            b_right_min = sys.maxsize
+        else:
+            b_left_max = b[b_left - 1]
+            b_right_min = b[b_left]
+
+        if a_left_max <= b_right_min and b_left_max <= a_right_min:
+            if is_even:
+                answer = (max(a_left_max, b_left_max) + min(a_right_min, b_right_min)) / 2.0
+            else:
+                answer = min(a_right_min, b_right_min)
+
+            return answer
+
+        if a_left_max > b_right_min:
+            a_left -= 1
+            b_left += 1
+
+        else:
+            a_left += 1
+            b_left -= 1
+
+        assert 0 <= a_left <= len(a)
+        assert 0 <= b_left <= len(b)
+        
 
 def generate_array():
     length = random.randint(1, 15)
