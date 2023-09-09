@@ -6,16 +6,14 @@ import random
 
 
 def solution(arr1, arr2, k):
-    bucket = set()
-    pair_to_value = {}
     value_to_pair = {}
     initial = (0, 0)
-    bucket.add(initial)
     value = arr1[initial[0]] + arr2[initial[1]]
     value_to_pair[value] = [initial]
-    pair_to_value[initial] = value
     result = []
-
+    bucket = set()
+    bucket.add(initial)
+    
     for i in range(k):
         if len(value_to_pair) == 0:
             break
@@ -26,28 +24,26 @@ def solution(arr1, arr2, k):
         result.append([arr1[pair[0]], arr2[pair[1]]])
 
         if pair[0] < len(arr1) - 1:
-            successor1 = (pair[0] + 1, pair[1])
-            bucket.add(successor1)
-            value = arr1[successor1[0]] + arr2[successor1[1]]
-            if value not in value_to_pair:
-                value_to_pair[value] = []
-            value_to_pair[value].append(successor1)
-            pair_to_value[successor1] = value
+            successor = (pair[0] + 1, pair[1])
+            if successor not in bucket:
+                value = arr1[successor[0]] + arr2[successor[1]]
+                if value not in value_to_pair:
+                    value_to_pair[value] = []
+                value_to_pair[value].append(successor)
+                bucket.add(successor)
 
         if pair[1] < len(arr2) - 1:
-            successor2 = (pair[0], pair[1] + 1)
-            bucket.add(successor2)
-            value = arr1[successor2[0]] + arr2[successor2[1]]
-            if value not in value_to_pair:
-                value_to_pair[value] = []
-            value_to_pair[value].append(successor2)
-            pair_to_value[successor2] = value
+            successor = (pair[0], pair[1] + 1)
+            if successor not in bucket:
+                value = arr1[successor[0]] + arr2[successor[1]]
+                if value not in value_to_pair:
+                    value_to_pair[value] = []
+                value_to_pair[value].append(successor)
+                bucket.add(successor)
 
-        del pair_to_value[pair]
-        value_to_pair[minkey].pop()
+        value_to_pair[minkey].pop(0)
         if len(value_to_pair[minkey]) == 0:
             del value_to_pair[minkey]
-        bucket.remove(pair)
 
     return result
 
