@@ -6,38 +6,74 @@ import random
 
 
 def solution(arr1, arr2, k):
-    c1, c2 = 0, 0
-    k = min(k, len(arr1) * len(arr2))
-    result = [[arr1[c1], arr2[c2]]]
+    bucket = set()
+    pair_to_value = {}
+    value_to_pair = {}
+    initial = (0, 0)
+    bucket.add(initial)
+    value = arr1[initial[0]] + arr2[initial[1]]
+    value_to_pair[value] = [initial]
+    pair_to_value[initial] = value
+    result = []
+
     for i in range(k):
-        if c1 == len(arr1) and c2 == len(arr2):
+        minkey = min(value_to_pair.keys())
+        pair = value_to_pair[minkey][0]
+
+        result.append([arr1[pair[0]], arr2[pair[1]]])
+
+        successor1 = successor2 = None
+        sum1 = sum2 = None
+        if pair[0] < len(arr1) - 1:
+            successor1 = (pair[0] + 1, pair[1])
+            sum1 = sum(arr1[successor1[0]], arr2[successor1[1]])
+
+        if pair[1] < len(arr2) - 1:
+            successor2 = (pair[0], pair[1] + 1)
+            sum2 = sum(arr1[successor2[0]], arr2[successor2[1]])
+
+        if sum1 is None and sum2 is None:
             break
 
-        if c1 < len(arr1) - 1:
-            p1 = [arr1[c1 + 1], arr2[c2]]
-        else:
-            p1 = None
-
-        if c2 < len(arr2) - 1:
-            p2 = [arr1[c1], arr2[c2 + 1]]
-        else:
-            p2 = None
-
-        if p1 and p2:
-            if sum(p1) < sum(p2):
-                result.append(p1)
-                c1 += 1
+        if sum1 is not None and sum2 is not None:
+            if sum1 < sum2:
+                bucket.add(successor1)
+                value = arr1[successor1[0]] + arr2[successor1[1]]
+                if value not in value_to_pair:
+                    value_to_pair[value] = []
+                value_to_pair[value].append(successor1)
+                pair_to_value[successor1] = value
             else:
-                result.append(p2)
-                c2 += 1
+                bucket.add(successor2)
+                value = arr1[successor2[0]] + arr2[successor2[1]]
+                if value not in value_to_pair:
+                    value_to_pair[value] = []
+                value_to_pair[value].append(successor2)
+                pair_to_value[successor2] = value
+
+            del pair_to_value[pair]
+            value_to_pair[minkey].pop()
+            bucket.remove(pair)
             continue
 
-        if p1:
-            result.append(p1)
-            c1 += 1
-        elif p2:
-            result.append(p2)
-            c2 += 1
+        if sum1 is not None:
+            bucket.add(successor1)
+            value = arr1[successor1[0]] + arr2[successor1[1]]
+            if value not in value_to_pair:
+                value_to_pair[value] = []
+            value_to_pair[value].append(successor1)
+            pair_to_value[successor1] = value
+        else:
+            bucket.add(successor2)
+            value = arr1[successor2[0]] + arr2[successor2[1]]
+            if value not in value_to_pair:
+                value_to_pair[value] = []
+            value_to_pair[value].append(successor2)
+            pair_to_value[successor2] = value
+
+        del pair_to_value[pair]
+        value_to_pair[minkey].pop()
+        bucket.remove(pair)
 
     return result
 
@@ -47,6 +83,13 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_4(self):
+        nums1 = [1, 1, 2]
+        nums2 = [1, 2, 3]
+        k = 10
+        expected = [[1, 1], [1, 1], [2, 1], [1, 2], [1, 2], [2, 2], [1, 3], [1, 3], [2, 3]]
+        self.assertEqual(expected, solution(nums1, nums2, k))
+
     def test_3(self):
         nums1 = [1, 7, 11]
         nums2 = [2, 4, 6]
