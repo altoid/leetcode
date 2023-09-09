@@ -17,53 +17,25 @@ def solution(arr1, arr2, k):
     result = []
 
     for i in range(k):
+        if len(value_to_pair) == 0:
+            break
+
         minkey = min(value_to_pair.keys())
         pair = value_to_pair[minkey][0]
 
         result.append([arr1[pair[0]], arr2[pair[1]]])
 
-        successor1 = successor2 = None
-        sum1 = sum2 = None
         if pair[0] < len(arr1) - 1:
             successor1 = (pair[0] + 1, pair[1])
-            sum1 = sum(arr1[successor1[0]], arr2[successor1[1]])
-
-        if pair[1] < len(arr2) - 1:
-            successor2 = (pair[0], pair[1] + 1)
-            sum2 = sum(arr1[successor2[0]], arr2[successor2[1]])
-
-        if sum1 is None and sum2 is None:
-            break
-
-        if sum1 is not None and sum2 is not None:
-            if sum1 < sum2:
-                bucket.add(successor1)
-                value = arr1[successor1[0]] + arr2[successor1[1]]
-                if value not in value_to_pair:
-                    value_to_pair[value] = []
-                value_to_pair[value].append(successor1)
-                pair_to_value[successor1] = value
-            else:
-                bucket.add(successor2)
-                value = arr1[successor2[0]] + arr2[successor2[1]]
-                if value not in value_to_pair:
-                    value_to_pair[value] = []
-                value_to_pair[value].append(successor2)
-                pair_to_value[successor2] = value
-
-            del pair_to_value[pair]
-            value_to_pair[minkey].pop()
-            bucket.remove(pair)
-            continue
-
-        if sum1 is not None:
             bucket.add(successor1)
             value = arr1[successor1[0]] + arr2[successor1[1]]
             if value not in value_to_pair:
                 value_to_pair[value] = []
             value_to_pair[value].append(successor1)
             pair_to_value[successor1] = value
-        else:
+
+        if pair[1] < len(arr2) - 1:
+            successor2 = (pair[0], pair[1] + 1)
             bucket.add(successor2)
             value = arr1[successor2[0]] + arr2[successor2[1]]
             if value not in value_to_pair:
@@ -73,6 +45,8 @@ def solution(arr1, arr2, k):
 
         del pair_to_value[pair]
         value_to_pair[minkey].pop()
+        if len(value_to_pair[minkey]) == 0:
+            del value_to_pair[minkey]
         bucket.remove(pair)
 
     return result
