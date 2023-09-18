@@ -22,6 +22,10 @@ def y_intercept(p, m):
 
 
 def solution(points):
+    if len(points) == 1:
+        return 1
+
+    points = list(map(tuple, points))
     non_vertical_lines = {}  # maps (m, b) to list of points
     vertical_lines = {}  # maps x intercept to list of points
 
@@ -31,23 +35,23 @@ def solution(points):
             if m is None:
                 x_int = points[i][0]
                 if x_int not in vertical_lines:
-                    vertical_lines[x_int] = []
-                vertical_lines[x_int].append(tuple(points[i]))
-                vertical_lines[x_int].append(tuple(points[j]))
+                    vertical_lines[x_int] = set()
+                vertical_lines[x_int].add(points[i])
+                vertical_lines[x_int].add(points[j])
             else:
                 b = y_intercept(points[i], m)
                 if (m, b) not in non_vertical_lines:
-                    non_vertical_lines[(m, b)] = []
-                non_vertical_lines[(m, b)].append(tuple(points[i]))
-                non_vertical_lines[(m, b)].append(tuple(points[j]))
+                    non_vertical_lines[(m, b)] = set()
+                non_vertical_lines[(m, b)].add(points[i])
+                non_vertical_lines[(m, b)].add(points[j])
 
     max_points = 0
     for k in non_vertical_lines.keys():
-        non_vertical_lines[k] = set(non_vertical_lines[k])
+        #non_vertical_lines[k] = set(non_vertical_lines[k])
         max_points = max(max_points, len(non_vertical_lines[k]))
 
     for k in vertical_lines.keys():
-        vertical_lines[k] = set(vertical_lines[k])
+        #vertical_lines[k] = set(vertical_lines[k])
         max_points = max(max_points, len(vertical_lines[k]))
 
     return max_points
