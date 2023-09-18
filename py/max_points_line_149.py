@@ -17,8 +17,8 @@ def slope(a, b):
     return (b[1] - a[1]) / (b[0] - a[0])
 
 
-def y_intercept(p, slope):
-    return p[1] - slope * p[0]
+def y_intercept(p, m):
+    return p[1] - m * p[0]
 
 
 def solution(points):
@@ -28,7 +28,6 @@ def solution(points):
     for i in range(len(points) - 1):
         for j in range(i + 1, len(points)):
             m = slope(points[i], points[j])
-            b = y_intercept(points[i], points[j])
             if m is None:
                 x_int = points[i][0]
                 if x_int not in vertical_lines:
@@ -36,6 +35,7 @@ def solution(points):
                 vertical_lines[x_int].append(tuple(points[i]))
                 vertical_lines[x_int].append(tuple(points[j]))
             else:
+                b = y_intercept(points[i], m)
                 if (m, b) not in non_vertical_lines:
                     non_vertical_lines[(m, b)] = []
                 non_vertical_lines[(m, b)].append(tuple(points[i]))
@@ -58,9 +58,12 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_2(self):
+        points = [[1, 1], [2, 2], [3, 3]]
+        expected = 3
+        self.assertEqual(expected, solution(points))
+
     def test_1(self):
         points = [[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]]
         expected = 4
         self.assertEqual(expected, solution(points))
-
-        
