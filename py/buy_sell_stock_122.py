@@ -23,6 +23,8 @@ def solution(prices):
             totalprofit += current_window_profit
             current_window_profit = 0
 
+    totalprofit += current_window_profit
+
     return totalprofit
 
 
@@ -39,6 +41,11 @@ if __name__ == '__main__':
 
 
 class MyTest(unittest.TestCase):
+    def test_4(self):
+        arr = [37, 10, 7, 13, 21]
+        expected = 14
+        self.assertEqual(expected, solution(arr))
+
     def test_3(self):
         arr = [7, 6, 4, 3, 1]
         expected = 0
@@ -46,7 +53,7 @@ class MyTest(unittest.TestCase):
 
     def test_2(self):
         arr = [1, 2, 3, 4, 5]
-        expected = 0
+        expected = 4
         self.assertEqual(expected, solution(arr))
 
     def test_1(self):
