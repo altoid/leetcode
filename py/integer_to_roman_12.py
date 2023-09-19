@@ -47,7 +47,7 @@ def solution(n):
     elif n >= 5:
         answer += 'V'
         n = n - 5
-        answer += 'I' * q
+        answer += 'I' * n
     elif n == 4:
         answer += 'IV'
     else:
